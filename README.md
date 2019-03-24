@@ -48,7 +48,7 @@ type Option interface {
 }
 ```
 
-The name `Option` can be customized along with other values as shown below.
+The name `Option` can be customized along with various method names as shown under [Options](#options) below.
 
 ## Installation
 
