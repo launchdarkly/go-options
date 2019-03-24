@@ -1,17 +1,15 @@
 # LaunchDarkly Options Generator
 
-The LaunchDarkly Options Generator generates boilerplate code for setting options for a configuration struct using varargs syntax.
-
-The idea is to start with this:
+The LaunchDarkly Options Generator generates boilerplate code for setting options for a configuration struct using varargs syntax.  You write this:
 
 ```
 //go:generate go-options -type=config
 type config struct {
-	howMany int `options:",5"`
+	howMany int
 }
 ```
 
-and be able to write this:
+Then run go generate and you can write this:
 
 ```
 cfg, err := newConfig(OptionHowMany(100))
@@ -30,6 +28,27 @@ func NewCollection(options... Option) (Foo, err) {
     return Collection{cfg}, nil
 }
 ```
+
+You can also specify default values and override the option name as follows:
+
+```
+//go:generate go-options -type=config
+type config struct {
+	howMany int `options:"number,5"
+}
+```
+
+This would create `OptionNumber` with a default value of 5.  Entering the the tag `options:",5"` would keep the default `OptionHowMany` name.
+
+Generated options are interoperable with any other user-created options that support the option interface:
+
+```
+type Option interface {
+    apply(config *c) error
+}
+```
+
+The name `Option` can be customized along with other values as shown below.
 
 ## Installation
 
