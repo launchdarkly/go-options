@@ -65,7 +65,7 @@ The syntax for a tag is:
 `go-options` can be customized with several command-line arguments:
 
 - `-type <string>` name of struct type to create options for (required)
-- `-func <string>` sets the name of function created to apply options to <type> (default is apply<Type>Options)
+- `-func <string>` sets the name of function created to apply options to <type> (default is apply&lt;Type&gt;Options)
 - `-new=false` controls generation of the function that returns a new config (default true)
 - `-option <string>` sets name of the interface to use for options (default "Option")
 - `-output <string>` sets the name of the output file (default is <type>_options.go)
