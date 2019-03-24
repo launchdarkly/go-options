@@ -1,0 +1,12 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: /go/src/github.com/launchdarkly/go-options
+    docker:
+      - image: circleci/golang
+    steps:
+      - checkout
+      - run: sudo apt-get install python-pip
+      - run: sudo pip install pre-commit
+      - run: make test

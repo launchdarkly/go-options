@@ -1,0 +1,17 @@
+repos:
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.15.0
+    hooks:
+      - id: golangci-lint
+        exclude: "vendor/"
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: HEAD
+    hooks:
+      - id: check-merge-conflict
+      - id: check-yaml
+
+  - repo: https://github.com/danielhoherd/pre-commit-circleci
+    rev: v0.0.2
+    hooks:
+      - id: circleci-validate
