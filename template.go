@@ -47,9 +47,9 @@ type {{ $.optionTypeName }} interface {
 }
 
 {{ range .options }}
-type {{ $.optionTypeName }}{{ .PublicName | ToTitle }} {{ .Type }}
+type {{ $.optionPrefix }}{{ .PublicName | ToTitle }} {{ .Type }}
 
-func (o {{ $.optionTypeName }}{{ .PublicName | ToTitle }}) apply(c *{{ $.configTypeName }}) error {
+func (o {{ $.optionPrefix }}{{ .PublicName | ToTitle }}) apply(c *{{ $.configTypeName }}) error {
   c.{{ .Name }} = {{ .Type }}(o)
   return nil
 }

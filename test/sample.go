@@ -18,3 +18,8 @@ type config struct {
 //go:generate go-options -type=configWithDifferentApply -func applyDifferent -option DifferentOption -new=false
 type configWithDifferentApply struct {
 }
+
+//go:generate go-options -type=configWithDifferentPrefix -prefix Opt -option MyOpt
+type configWithDifferentPrefix struct {
+	myFloat float64
+}

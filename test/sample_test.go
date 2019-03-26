@@ -85,3 +85,10 @@ var _ = Describe("Customizing the apply function name", func() {
 		Ω(err).NotTo(HaveOccurred())
 	})
 })
+
+var _ = Describe("Customizing the option prefix", func() {
+	It("creates options with the custom prefix", func() {
+		_, err := newConfigWithDifferentPrefix(OptMyFloat(1.23))
+		Ω(err).NotTo(HaveOccurred())
+	})
+})

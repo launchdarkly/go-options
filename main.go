@@ -21,6 +21,7 @@ var outputName string
 var applyFunctionName string
 var createNewFunc bool
 var runGoFmt bool
+var optionPrefix string
 
 func initFlags() {
 	flag.StringVar(&typeName, "type", "", "name of struct to create options for")
@@ -28,6 +29,7 @@ func initFlags() {
 	flag.StringVar(&optionInterfaceName, "option", "Option", "name of the interface to use for options")
 	flag.StringVar(&outputName, "output", "", "name of output file (default is <type>_options.go)")
 	flag.StringVar(&applyFunctionName, "func", "", `name of function created to apply options to <type> (default is "apply<Type>Options")`)
+	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
 }
 
@@ -142,10 +144,16 @@ func writeOptionsFile(packageName string, node ast.Node) (found bool) {
 
 		buf := bytes.NewBuffer([]byte(fmt.Sprintf("package %s\n\n", packageName)))
 
+		prefix := optionInterfaceName
+		if optionPrefix != "" {
+			prefix = optionPrefix
+		}
+
 		err := codeTemplate.Execute(buf, map[string]interface{}{
 			"options":        options,
 			"optionTypeName": optionInterfaceName,
 			"configTypeName": typeName,
+			"optionPrefix": prefix,
 			"applyFuncName":  applyFunctionName,
 			"createNewFunc":  createNewFunc,
 		})
