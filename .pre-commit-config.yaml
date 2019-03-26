@@ -6,12 +6,13 @@ repos:
         exclude: "vendor/"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: HEAD
+    rev: v2.1.0
     hooks:
       - id: check-merge-conflict
       - id: check-yaml
+      - id: no-commit-to-branch
 
   - repo: https://github.com/danielhoherd/pre-commit-circleci
-    rev: v0.0.2
+    rev: v0.0.3
     hooks:
       - id: circleci-validate

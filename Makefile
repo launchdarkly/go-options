@@ -5,7 +5,7 @@ test:
 	go test ./...
 
 lint:
-	pre-commit run -a
+	SKIP=no-commit-to-branch pre-commit run -a
 
 .PHONY: lint test
 
