@@ -69,3 +69,5 @@ The syntax for a tag is:
 - `-new=false` controls generation of the function that returns a new config (default true)
 - `-option <string>` sets name of the interface to use for options (default "Option")
 - `-output <string>` sets the name of the output file (default is <type>_options.go)
+- `-fmt=false` disable running gofmt
+

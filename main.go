@@ -8,6 +8,7 @@ import (
 	"go/token"
 	"io/ioutil"
 	"log"
+	"os/exec"
 
 	"github.com/fatih/structtag"
 
@@ -19,6 +20,7 @@ var optionInterfaceName string
 var outputName string
 var applyFunctionName string
 var createNewFunc bool
+var runGoFmt bool
 
 func initFlags() {
 	flag.StringVar(&typeName, "type", "", "name of struct to create options for")
@@ -26,6 +28,7 @@ func initFlags() {
 	flag.StringVar(&optionInterfaceName, "option", "Option", "name of the interface to use for options")
 	flag.StringVar(&outputName, "output", "", "name of output file (default is <type>_options.go)")
 	flag.StringVar(&applyFunctionName, "func", "", `name of function created to apply options to <type> (default is "apply<Type>Options")`)
+	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
 }
 
 type Option struct {
@@ -147,10 +150,13 @@ func writeOptionsFile(packageName string, node ast.Node) (found bool) {
 			"createNewFunc":  createNewFunc,
 		})
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(fmt.Errorf("template execute failed: %s", err))
 		}
 		if err := ioutil.WriteFile(outputFileName, buf.Bytes(), 0644); err != nil {
-			log.Fatal(err)
+			log.Fatal(fmt.Errorf("write failed: %s", err))
+		}
+		if err := exec.Command("gofmt", "-w", outputFileName).Run(); err != nil {
+			log.Fatal(fmt.Errorf("gofmt failed: %s", err))
 		}
 	}
 
