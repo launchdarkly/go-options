@@ -6,3 +6,6 @@ test:
 
 lint:
 	pre-commit run -a
+
+.PHONY: lint test
+
