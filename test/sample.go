@@ -3,9 +3,10 @@ package test
 import (
 	"net/url"
 	"time"
+	time2 "time"
 )
 
-//go:generate go-options -imports=time,url=net/url config
+//go:generate go-options -imports=time,net/url,time2=time config
 type config struct {
 	myInt                   int
 	myIntWithDefault        int `options:",1"`
@@ -22,6 +23,7 @@ type config struct {
 	// types requiring imports
 	myURL url.URL
 	myDuration time.Duration
+	myDuration2 time2.Duration
 }
 
 //go:generate go-options -type=configWithDifferentApply -func applyDifferent -option DifferentOption -new=false

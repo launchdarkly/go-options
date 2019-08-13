@@ -79,13 +79,19 @@ var _ = Describe("Generating options", func() {
 	})
 
 	Describe("imports", func() {
-		It("can accept types using simple imports", func() {
+		It("works with imported types", func() {
 			err := applyConfigOptions(&cfg, OptionMyDuration(time.Second))
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myDuration).Should(Equal(time.Second))
 		})
 
-		It("can accept types using aliased imports", func() {
+		It("works with aliased imports", func() {
+			err := applyConfigOptions(&cfg, OptionMyDuration2(time.Second))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myDuration).Should(Equal(time.Second))
+		})
+
+		It("works with nested packages", func() {
 			myURL, err := url.Parse("http://example.com")
 			Ω(err).ShouldNot(HaveOccurred())
 			err = applyConfigOptions(&cfg, OptionMyURL(*myURL))

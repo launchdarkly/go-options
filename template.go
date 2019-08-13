@@ -19,8 +19,12 @@ const codeTemplateText = `
 {{ if .imports }}
 import (
 {{- range .imports }}
+{{ if .Alias -}}
   {{ .Alias }} "{{ .Path }}"
-{{- end }}
+{{ else }}
+"{{ .Path }}"
+{{ end }}
+{{ end }}
 )
 {{ end }}
 
@@ -63,35 +67,3 @@ func (o {{ $.optionPrefix }}{{ .PublicName | ToTitle }}) apply(c *{{ $.configTyp
 }
 {{ end }}
 `
-
-//func newConfig(options ...Option) (config, error) {
-//	c := config{
-//		maxJobs:            defaultMaxJobs,
-//		gracePeriodSeconds: defaultGracePeriodSeconds,
-//	}
-//	for _, o := range options {
-//		err := o.apply(&c)
-//		if err != nil {
-//			return config{}, err
-//		}
-//	}
-//	return c, nil
-//}
-//
-//type Option interface {
-//	apply(*config) error
-//}
-//
-//type OptionMaxJobs int
-//
-//func (o OptionMaxJobs) apply(g *config) error {
-//	g.maxJobs = int(o)
-//	return nil
-//}
-//
-//type OptionGracePeriodSeconds int
-//
-//func (o OptionGracePeriodSeconds) apply(g *config) error {
-//	g.gracePeriodSeconds = int(o)
-//	return nil
-//}
