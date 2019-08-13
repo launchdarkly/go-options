@@ -54,9 +54,15 @@ func main() {
 	initFlags()
 	flag.Parse()
 
-	if typeName == "" {
+	types := flag.Args()
+
+	if typeName == "" && len(types) == 0 {
 		flag.Usage()
 		log.Fatal("missing arguments")
+	}
+
+	if typeName != "" {
+		types = append(types, typeName)
 	}
 
 	cfg := &packages.Config{
@@ -76,7 +82,7 @@ func main() {
 	success := false
 	for _, file := range pkgs[0].Syntax {
 		ast.Inspect(file, func(node ast.Node) bool {
-			found := writeOptionsFile(pkgs[0].Name, node, pkgs[0].Fset)
+			found := writeOptionsFile(types, pkgs[0].Name, node, pkgs[0].Fset)
 			if found {
 				success = true
 			}
@@ -89,7 +95,7 @@ func main() {
 	}
 }
 
-func writeOptionsFile(packageName string, node ast.Node, fset *token.FileSet) (found bool) {
+func writeOptionsFile(types []string, packageName string, node ast.Node, fset *token.FileSet) (found bool) {
 	decl, ok := node.(*ast.GenDecl)
 	if !ok || decl.Tok != token.TYPE {
 		return false
@@ -102,7 +108,14 @@ func writeOptionsFile(packageName string, node ast.Node, fset *token.FileSet) (f
 			continue
 		}
 
-		if typeSpec.Name.String() != typeName {
+		var typeName string
+		for _, n := range types {
+			if typeSpec.Name.String() == n {
+				typeName = n
+				break
+			}
+		}
+		if typeName == "" {
 			continue
 		}
 

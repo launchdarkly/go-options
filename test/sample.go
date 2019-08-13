@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-//go:generate go-options -type=config -imports=time,url=net/url
+//go:generate go-options -imports=time,url=net/url config
 type config struct {
 	myInt                   int
 	myIntWithDefault        int `options:",1"`
