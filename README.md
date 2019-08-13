@@ -3,7 +3,7 @@
 The LaunchDarkly Options Generator generates boilerplate code for setting options for a configuration struct using varargs syntax.  You write this:
 
 ```
-//go:generate go-options -type=config
+//go:generate go-options config
 type config struct {
 	howMany int
 }
@@ -32,7 +32,7 @@ func NewCollection(options... Option) (Foo, err) {
 You can also specify default values and override the option name as follows:
 
 ```
-//go:generate go-options -type=config
+//go:generate go-options config
 type config struct {
 	howMany int `options:"number,5"
 }
@@ -64,10 +64,11 @@ The syntax for a tag is:
 
 `go-options` can be customized with several command-line arguments:
 
-- `-type <string>` name of struct type to create options for (required)
+- `-fmt=false` disable running gofmt
 - `-func <string>` sets the name of function created to apply options to <type> (default is apply&lt;Type&gt;Options)
 - `-new=false` controls generation of the function that returns a new config (default true)
+- `-imports=[<path>|<alias>=<path>],...` add imports to generated file
 - `-option <string>` sets name of the interface to use for options (default "Option")
-- `-prefix <string>` sets prefix to be used for options (defaults to the value of `option`)
 - `-output <string>` sets the name of the output file (default is <type>_options.go)
-- `-fmt=false` disable running gofmt
+- `-prefix <string>` sets prefix to be used for options (defaults to the value of `option`)
+- `-type <string>` name of struct type to create options for (original syntax before multiple types on command-line were supported)

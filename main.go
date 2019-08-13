@@ -5,10 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"go/ast"
+	"go/printer"
 	"go/token"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/fatih/structtag"
 
@@ -22,15 +25,25 @@ var applyFunctionName string
 var createNewFunc bool
 var runGoFmt bool
 var optionPrefix string
+var imports string
+
+var Usage = func() {
+	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s <type>:\n\n", os.Args[0])
+	fmt.Fprintf(flag.CommandLine.Output(), "  %s [<option> ... ] <config type> ...\n\n", os.Args[0])
+	fmt.Fprintf(flag.CommandLine.Output(), "  where <option> can be any of:\n\n")
+	flag.PrintDefaults()
+}
 
 func initFlags() {
 	flag.StringVar(&typeName, "type", "", "name of struct to create options for")
 	flag.BoolVar(&createNewFunc, "new", true, "with to create a function to return a new config")
 	flag.StringVar(&optionInterfaceName, "option", "Option", "name of the interface to use for options")
+	flag.StringVar(&imports, "imports", "", "a comma-separated list of packages with optional alias (e.g. time,url=net/url) ")
 	flag.StringVar(&outputName, "output", "", "name of output file (default is <type>_options.go)")
 	flag.StringVar(&applyFunctionName, "func", "", `name of function created to apply options to <type> (default is "apply<Type>Options")`)
 	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
+	flag.Usage = Usage
 }
 
 type Option struct {
@@ -40,13 +53,24 @@ type Option struct {
 	Type         string
 }
 
+type Import struct {
+	Alias string
+	Path string
+}
+
 func main() {
 	initFlags()
 	flag.Parse()
+flag.CommandLine.ErrorHandling()
+	types := flag.Args()
 
-	if typeName == "" {
+	if typeName == "" && len(types) == 0 {
 		flag.Usage()
 		log.Fatal("missing arguments")
+	}
+
+	if typeName != "" {
+		types = append(types, typeName)
 	}
 
 	cfg := &packages.Config{
@@ -66,7 +90,7 @@ func main() {
 	success := false
 	for _, file := range pkgs[0].Syntax {
 		ast.Inspect(file, func(node ast.Node) bool {
-			found := writeOptionsFile(pkgs[0].Name, node)
+			found := writeOptionsFile(types, pkgs[0].Name, node, pkgs[0].Fset)
 			if found {
 				success = true
 			}
@@ -79,7 +103,7 @@ func main() {
 	}
 }
 
-func writeOptionsFile(packageName string, node ast.Node) (found bool) {
+func writeOptionsFile(types []string, packageName string, node ast.Node, fset *token.FileSet) (found bool) {
 	decl, ok := node.(*ast.GenDecl)
 	if !ok || decl.Tok != token.TYPE {
 		return false
@@ -92,7 +116,14 @@ func writeOptionsFile(packageName string, node ast.Node) (found bool) {
 			continue
 		}
 
-		if typeSpec.Name.String() != typeName {
+		var typeName string
+		for _, n := range types {
+			if typeSpec.Name.String() == n {
+				typeName = n
+				break
+			}
+		}
+		if typeName == "" {
 			continue
 		}
 
@@ -120,7 +151,11 @@ func writeOptionsFile(packageName string, node ast.Node) (found bool) {
 					}
 				}
 			}
-			typeStr := fmt.Sprintf("%s", field.Type)
+			typeBuf := new(bytes.Buffer)
+			if err := printer.Fprint(typeBuf, fset, field.Type); err != nil {
+				log.Fatalf("ERROR: unable to print type: %s", err)
+			}
+			typeStr :=  typeBuf.String()
 			if typeStr == "string" && defaultValue != "" {
 				defaultValue = fmt.Sprintf("`%s`", defaultValue)
 			}
@@ -137,6 +172,20 @@ func writeOptionsFile(packageName string, node ast.Node) (found bool) {
 			}
 		}
 
+		var importList []Import
+		if imports != "" {
+			for _, s := range strings.Split(imports, ",") {
+				parts := strings.Split(s, "=")
+				if len(parts) == 1 {
+					importList = append(importList, Import{Path: parts[0]})
+				} else if len(parts) == 2 {
+					importList = append(importList, Import{Alias: parts[0], Path: parts[1]})
+				} else {
+					log.Fatalf(`ERROR: unexpected import description "%s"`, s)
+				}
+			}
+		}
+
 		outputFileName := fmt.Sprintf("%s_options.go", typeSpec.Name)
 		if outputName != "" {
 			outputFileName = outputName
@@ -150,6 +199,7 @@ func writeOptionsFile(packageName string, node ast.Node) (found bool) {
 		}
 
 		err := codeTemplate.Execute(buf, map[string]interface{}{
+			"imports":        importList,
 			"options":        options,
 			"optionTypeName": optionInterfaceName,
 			"configTypeName": typeName,
@@ -163,7 +213,9 @@ func writeOptionsFile(packageName string, node ast.Node) (found bool) {
 		if err := ioutil.WriteFile(outputFileName, buf.Bytes(), 0644); err != nil {
 			log.Fatal(fmt.Errorf("write failed: %s", err))
 		}
-		if err := exec.Command("gofmt", "-w", outputFileName).Run(); err != nil {
+		cmd := exec.Command("gofmt", "-w", outputFileName)
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
 			log.Fatal(fmt.Errorf("gofmt failed: %s", err))
 		}
 	}
