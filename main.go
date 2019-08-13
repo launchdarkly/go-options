@@ -27,6 +27,13 @@ var runGoFmt bool
 var optionPrefix string
 var imports string
 
+var Usage = func() {
+	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s <type>:\n\n", os.Args[0])
+	fmt.Fprintf(flag.CommandLine.Output(), "  %s [<option> ... ] <config type> ...\n\n", os.Args[0])
+	fmt.Fprintf(flag.CommandLine.Output(), "  where <option> can be any of:\n\n")
+	flag.PrintDefaults()
+}
+
 func initFlags() {
 	flag.StringVar(&typeName, "type", "", "name of struct to create options for")
 	flag.BoolVar(&createNewFunc, "new", true, "with to create a function to return a new config")
@@ -36,6 +43,7 @@ func initFlags() {
 	flag.StringVar(&applyFunctionName, "func", "", `name of function created to apply options to <type> (default is "apply<Type>Options")`)
 	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
+	flag.Usage = Usage
 }
 
 type Option struct {
@@ -53,7 +61,7 @@ type Import struct {
 func main() {
 	initFlags()
 	flag.Parse()
-
+flag.CommandLine.ErrorHandling()
 	types := flag.Args()
 
 	if typeName == "" && len(types) == 0 {
