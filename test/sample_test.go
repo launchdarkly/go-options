@@ -2,7 +2,9 @@ package test
 
 import (
 	"errors"
+	"net/url"
 	"testing"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -38,43 +40,60 @@ var _ = Describe("Generating options", func() {
 			OptionMyFloat(4.56),
 			OptionMyString("my-string"),
 		)
-		Ω(err).NotTo(HaveOccurred())
-		Ω(cfg.myInt).To(Equal(123))
-		Ω(cfg.myFloat).To(Equal(4.56))
-		Ω(cfg.myString).To(Equal("my-string"))
+		Ω(err).ShouldNot(HaveOccurred())
+		Ω(cfg.myInt).Should(Equal(123))
+		Ω(cfg.myFloat).Should(Equal(4.56))
+		Ω(cfg.myString).Should(Equal("my-string"))
 	})
 
 	It("generates an new function create a config", func() {
 		cfg, err := newConfig(OptionMyInt(123))
-		Ω(err).NotTo(HaveOccurred())
-		Ω(cfg.myInt).To(Equal(123))
+		Ω(err).ShouldNot(HaveOccurred())
+		Ω(cfg.myInt).Should(Equal(123))
 	})
 
 	It("sets default values", func() {
 		err := applyConfigOptions(&cfg)
-		Ω(err).NotTo(HaveOccurred())
-		Ω(cfg.myIntWithDefault).To(Equal(1))
-		Ω(cfg.myStringWithDefault).To(Equal("default string"))
-		Ω(cfg.myFloatWithDefault).To(Equal(1.23))
+		Ω(err).ShouldNot(HaveOccurred())
+		Ω(cfg.myIntWithDefault).Should(Equal(1))
+		Ω(cfg.myStringWithDefault).Should(Equal("default string"))
+		Ω(cfg.myFloatWithDefault).Should(Equal(1.23))
 	})
 
 	It("defines constants for default values", func() {
 		err := applyConfigOptions(&cfg, OptionMakeError{})
-		Ω(err).To(MatchError("bad news"))
+		Ω(err).Should(MatchError("bad news"))
 	})
 
 	Describe("custom options", func() {
 		It("can be extended with custom options", func() {
 			err := applyConfigOptions(&cfg, OptionSetMyInt123{})
-			Ω(err).NotTo(HaveOccurred())
-			Ω(cfg.myInt).To(Equal(123))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myInt).Should(Equal(123))
 		})
 
 		It("returns error from custom options", func() {
 			err := applyConfigOptions(&cfg, OptionMakeError{})
-			Ω(err).To(MatchError("bad news"))
+			Ω(err).Should(MatchError("bad news"))
 		})
 	})
+
+	Describe("imports", func() {
+		It("can accept types using simple imports", func() {
+			err := applyConfigOptions(&cfg, OptionMyDuration(time.Second))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myDuration).Should(Equal(time.Second))
+		})
+
+		It("can accept types using aliased imports", func() {
+			myURL, err := url.Parse("http://example.com")
+			Ω(err).ShouldNot(HaveOccurred())
+			err = applyConfigOptions(&cfg, OptionMyURL(*myURL))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myURL).Should(Equal(*myURL))
+		})
+	})
+
 })
 
 var _ = Describe("Customizing the apply function name", func() {
@@ -82,13 +101,13 @@ var _ = Describe("Customizing the apply function name", func() {
 
 	It("uses the provided function name", func() {
 		err := applyDifferent(&cfg)
-		Ω(err).NotTo(HaveOccurred())
+		Ω(err).ShouldNot(HaveOccurred())
 	})
 })
 
 var _ = Describe("Customizing the option prefix", func() {
 	It("creates options with the custom prefix", func() {
 		_, err := newConfigWithDifferentPrefix(OptMyFloat(1.23))
-		Ω(err).NotTo(HaveOccurred())
+		Ω(err).ShouldNot(HaveOccurred())
 	})
 })

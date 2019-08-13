@@ -1,6 +1,11 @@
 package test
 
-//go:generate go-options -type=config
+import (
+	"net/url"
+	"time"
+)
+
+//go:generate go-options -type=config -imports=time,url=net/url
 type config struct {
 	myInt                   int
 	myIntWithDefault        int `options:",1"`
@@ -13,6 +18,10 @@ type config struct {
 	myString              string
 	myStringWithDefault   string `options:",default string"`
 	myStringWithoutOption string `options:"-"` // nolint:structcheck,unused // not expected to be used
+
+	// types requiring imports
+	myURL url.URL
+	myDuration time.Duration
 }
 
 //go:generate go-options -type=configWithDifferentApply -func applyDifferent -option DifferentOption -new=false
