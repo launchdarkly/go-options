@@ -20,6 +20,8 @@ type config struct {
 	myStringWithDefault   string `options:",default string"`
 	myStringWithoutOption string `options:"-"` // nolint:structcheck,unused // not expected to be used
 
+	myFunc              func() int
+
 	// types requiring imports
 	myURL url.URL
 	myDuration time.Duration
