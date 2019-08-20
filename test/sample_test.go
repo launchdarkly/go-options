@@ -39,6 +39,7 @@ var _ = Describe("Generating options", func() {
 			OptionMyInt(123),
 			OptionMyFloat(4.56),
 			OptionMyString("my-string"),
+			OptionMyFunc(func() int { return 0 }),
 		)
 		Ω(err).ShouldNot(HaveOccurred())
 		Ω(cfg.myInt).Should(Equal(123))

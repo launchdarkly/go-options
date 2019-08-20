@@ -18,12 +18,8 @@ const codeTemplateText = `
 
 {{ if .imports }}
 import (
-{{- range .imports }}
-{{ if .Alias -}}
-  {{ .Alias }} "{{ .Path }}"
-{{ else }}
-"{{ .Path }}"
-{{ end }}
+{{ range .imports }}
+{{ if .Alias }}  {{ .Alias }} "{{ .Path }}"{{ else }}  "{{ .Path }}"{{ end -}}
 {{ end }}
 )
 {{ end }}
@@ -62,7 +58,7 @@ type {{ $.optionTypeName }} interface {
 type {{ $.optionPrefix }}{{ .PublicName | ToTitle }} {{ .Type }}
 
 func (o {{ $.optionPrefix }}{{ .PublicName | ToTitle }}) apply(c *{{ $.configTypeName }}) error {
-  c.{{ .Name }} = {{ .Type }}(o)
+  c.{{ .Name }} = ({{ .Type }})(o)
   return nil
 }
 {{ end }}
