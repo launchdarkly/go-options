@@ -54,7 +54,7 @@ type Option struct {
 	PublicName   string
 	DefaultValue string
 	Type         string
-	HasPointerReceiver bool
+	IsPointer    bool
 }
 
 type Import struct {
@@ -167,12 +167,15 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 				if publicName == "" {
 					publicName = n.Name
 				}
+				// TODO: inspect the actual type in case the type itself is a pointer receiver
+				_, isPointer := field.Type.(*ast.StarExpr)
+
 				options = append(options, Option{
 					Name:         n.Name,
 					PublicName:   publicName,
 					DefaultValue: defaultValue,
 					Type:         typeStr,
-					HasPointerReceiver: strings.HasPrefix(strings.TrimSpace(typeStr), "*"), // TODO: inspect the actual type
+					IsPointer:    isPointer,
 				})
 			}
 		}

@@ -63,7 +63,7 @@ type {{ $.optionTypeName }} interface {
 }
 
 {{ range .options }}
-{{ if .HasPointerReceiver }}
+{{ if .IsPointer }}
 func {{ $.optionPrefix }}{{ .PublicName | ToTitle }}(o {{ .Type }}) {{ $applyOptionFuncType }} {
 	return func(c *{{ $.configTypeName }}) error {
     c.{{ .Name }} = ({{ .Type }})(o)

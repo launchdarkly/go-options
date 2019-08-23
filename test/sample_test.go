@@ -40,14 +40,14 @@ var _ = Describe("Generating options", func() {
 			OptionMyInt(123),
 			OptionMyFloat(4.56),
 			OptionMyString("my-string"),
-			OptionMyPointerReceiver(&myInt),
+			OptionMyIntPointer(&myInt),
 			OptionMyFunc(func() int { return 0 }),
 		)
 		Ω(err).ShouldNot(HaveOccurred())
 		Ω(cfg.myInt).Should(Equal(123))
 		Ω(cfg.myFloat).Should(Equal(4.56))
 		Ω(cfg.myString).Should(Equal("my-string"))
-		Ω(cfg.myPointerReceiver).Should(Equal(&myInt))
+		Ω(cfg.myIntPointer).Should(Equal(&myInt))
 	})
 
 	It("generates an new function create a config", func() {

@@ -22,7 +22,7 @@ type config struct {
 
 	myFunc              func() int
 
-	myPointerReceiver *int
+	myIntPointer *int
 
 
 	// types requiring imports
