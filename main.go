@@ -22,6 +22,7 @@ var typeName string
 var optionInterfaceName string
 var outputName string
 var applyFunctionName string
+var applyOptionFunctionType string
 var createNewFunc bool
 var runGoFmt bool
 var optionPrefix string
@@ -41,6 +42,8 @@ func initFlags() {
 	flag.StringVar(&imports, "imports", "", "a comma-separated list of packages with optional alias (e.g. time,url=net/url) ")
 	flag.StringVar(&outputName, "output", "", "name of output file (default is <type>_options.go)")
 	flag.StringVar(&applyFunctionName, "func", "", `name of function created to apply options to <type> (default is "apply<Type>Options")`)
+	flag.StringVar(&applyOptionFunctionType, "option_func", "",
+		`name of function type created to apply options with pointer receiver to <type> (default is "apply<Option>Func")`)
 	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
 	flag.Usage = Usage
@@ -51,6 +54,7 @@ type Option struct {
 	PublicName   string
 	DefaultValue string
 	Type         string
+	IsPointer    bool
 }
 
 type Import struct {
@@ -163,11 +167,15 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 				if publicName == "" {
 					publicName = n.Name
 				}
+				// TODO: inspect the actual type in case the type itself is a pointer receiver
+				_, isPointer := field.Type.(*ast.StarExpr)
+
 				options = append(options, Option{
 					Name:         n.Name,
 					PublicName:   publicName,
 					DefaultValue: defaultValue,
 					Type:         typeStr,
+					IsPointer:    isPointer,
 				})
 			}
 		}
@@ -199,13 +207,14 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 		}
 
 		err := codeTemplate.Execute(buf, map[string]interface{}{
-			"imports":        importList,
-			"options":        options,
-			"optionTypeName": optionInterfaceName,
-			"configTypeName": typeName,
-			"optionPrefix": prefix,
-			"applyFuncName":  applyFunctionName,
-			"createNewFunc":  createNewFunc,
+			"imports":             importList,
+			"options":             options,
+			"optionTypeName":      optionInterfaceName,
+			"configTypeName":      typeName,
+			"optionPrefix":        prefix,
+			"applyFuncName":       applyFunctionName,
+			"applyOptionFuncName": applyOptionFunctionType,
+			"createNewFunc":       createNewFunc,
 		})
 		if err != nil {
 			log.Fatal(fmt.Errorf("template execute failed: %s", err))

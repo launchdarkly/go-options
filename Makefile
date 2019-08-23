@@ -1,4 +1,5 @@
 test:
+	go clean -i .
 	go install .
 	go generate ./...
 	$(MAKE) lint

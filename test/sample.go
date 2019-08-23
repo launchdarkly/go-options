@@ -22,6 +22,9 @@ type config struct {
 
 	myFunc              func() int
 
+	myIntPointer *int
+
+
 	// types requiring imports
 	myURL url.URL
 	myDuration time.Duration

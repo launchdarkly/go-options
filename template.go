@@ -28,6 +28,14 @@ import (
 const default{{ $.configTypeName | ToTitle }}{{ .Name | ToTitle }} {{ .Type }} = {{ .DefaultValue }}
 {{ end }}{{ end }}
 
+{{ $applyOptionFuncType := or $.applyOptionFuncType (printf "apply%sFunc" (ToTitle $.optionTypeName)) }} 
+
+type {{ $applyOptionFuncType }} func(c *{{ $.configTypeName }}) error
+
+func (f {{ $applyOptionFuncType }}) apply(c *{{ $.configTypeName }}) error {
+	return f(c)
+}
+
 {{ $applyFuncName := or $.applyFuncName (printf "apply%sOptions" (ToTitle $.configTypeName)) }} 
 
 {{ if $.createNewFunc}} 
@@ -55,11 +63,20 @@ type {{ $.optionTypeName }} interface {
 }
 
 {{ range .options }}
+{{ if .IsPointer }}
+func {{ $.optionPrefix }}{{ .PublicName | ToTitle }}(o {{ .Type }}) {{ $applyOptionFuncType }} {
+	return func(c *{{ $.configTypeName }}) error {
+    c.{{ .Name }} = ({{ .Type }})(o)
+    return nil
+	}
+}
+{{ else }}
 type {{ $.optionPrefix }}{{ .PublicName | ToTitle }} {{ .Type }}
 
 func (o {{ $.optionPrefix }}{{ .PublicName | ToTitle }}) apply(c *{{ $.configTypeName }}) error {
   c.{{ .Name }} = ({{ .Type }})(o)
   return nil
 }
+{{ end }}
 {{ end }}
 `
