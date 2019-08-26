@@ -32,6 +32,21 @@ type config struct {
 	myURL       url.URL
 	myDuration  time.Duration
 	myDuration2 time2.Duration
+
+	myStruct            struct{ a, b int }
+	myStructWithDefault struct {
+		a int `options:",1"`
+	}
+	myOptionalStruct          *struct{ a, b int }
+	myStructWithSlice         struct{ a []int }
+	myStructWithVariadicSlice struct {
+		a int
+		b []string `options:"..."`
+	}
+
+	mySlice         []int  `options:"..."`
+	myOptionalSlice *[]int `options:"..."`
+	myRenamedSlice  []int  `options:"yourSlice..."`
 }
 
 //go:generate go-options -type=configWithDifferentApply -func applyDifferent -option DifferentOption -new=false

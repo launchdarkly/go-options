@@ -104,6 +104,51 @@ var _ = Describe("Generating options", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myURL).Should(Equal(*myURL))
 		})
+
+		It("works with nested structs", func() {
+			err := applyConfigOptions(&cfg, OptionMyStruct(1, 2))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myStruct.a).Should(Equal(1))
+			Ω(cfg.myStruct.b).Should(Equal(2))
+		})
+
+		It("works with nested optional structs", func() {
+			err := applyConfigOptions(&cfg)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myOptionalStruct).Should(BeNil())
+
+			err = applyConfigOptions(&cfg, OptionMyOptionalStruct(1, 2))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myOptionalStruct).ShouldNot(BeNil())
+			Ω(cfg.myOptionalStruct.a).Should(Equal(1))
+			Ω(cfg.myOptionalStruct.b).Should(Equal(2))
+		})
+
+		Describe("variadic slices", func() {
+			It("creates a variadic constructor", func() {
+				err := applyConfigOptions(&cfg, OptionMySlice(1, 2))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(cfg.mySlice).Should(ConsistOf(1, 2))
+			})
+
+			It("allows them to be optional", func() {
+				err := applyConfigOptions(&cfg)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(cfg.myOptionalSlice).Should(BeNil())
+
+				err = applyConfigOptions(&cfg, OptionMyOptionalSlice(1, 2))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(cfg.myOptionalSlice).ShouldNot(BeNil())
+				Ω(*cfg.myOptionalSlice).Should(ConsistOf(1, 2))
+			})
+
+			It("allows them to be renamed", func() {
+				err := applyConfigOptions(&cfg, OptionYourSlice(1, 2))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(cfg.myRenamedSlice).ShouldNot(BeNil())
+				Ω(cfg.myRenamedSlice).Should(ConsistOf(1, 2))
+			})
+		})
 	})
 
 })
