@@ -24,6 +24,7 @@ type config struct {
 
 	myIntPointer *int
 
+	myInterface interface{}
 
 	// types requiring imports
 	myURL url.URL
