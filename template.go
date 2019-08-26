@@ -63,7 +63,11 @@ type {{ $.optionTypeName }} interface {
 }
 
 {{ range .options }}
-func {{ $.optionPrefix }}{{ .PublicName | ToTitle }}(o {{ .Type }}) {{ $applyOptionFuncType }} {
+{{ $name := .PublicName | ToTitle | printf "%s%s" $.optionPrefix }} 
+{{ if .Docs }}
+{{- range $i, $doc := .Docs }}// {{ if eq $i 0 }}{{ $name }} {{ end }}{{ $doc }}{{ end -}}
+{{ end -}}
+func {{ $name }}(o {{ .Type }}) {{ $applyOptionFuncType }} {
 	return func(c *{{ $.configTypeName }}) error {
     c.{{ .Name }} = ({{ .Type }})(o)
     return nil

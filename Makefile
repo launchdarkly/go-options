@@ -4,9 +4,14 @@ test:
 	go generate ./...
 	$(MAKE) lint
 	go test ./...
+	diff test/config_options.go test/golden/config_options.go
 
 lint:
 	SKIP=no-commit-to-branch pre-commit run -a
 
-.PHONY: lint test
+golden:
+	mkdir -p test/golden
+	cp test/config_options.go test/golden/
+
+.PHONY: lint golden test
 
