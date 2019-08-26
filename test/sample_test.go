@@ -41,6 +41,7 @@ var _ = Describe("Generating options", func() {
 			OptionMyFloat(4.56),
 			OptionMyString("my-string"),
 			OptionMyIntPointer(&myInt),
+			OptionMyInterface(789),
 			OptionMyFunc(func() int { return 0 }),
 		)
 		Ω(err).ShouldNot(HaveOccurred())
@@ -48,6 +49,7 @@ var _ = Describe("Generating options", func() {
 		Ω(cfg.myFloat).Should(Equal(4.56))
 		Ω(cfg.myString).Should(Equal("my-string"))
 		Ω(cfg.myIntPointer).Should(Equal(&myInt))
+		Ω(cfg.myInterface).Should(Equal(789))
 	})
 
 	It("generates an new function create a config", func() {

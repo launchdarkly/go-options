@@ -63,20 +63,11 @@ type {{ $.optionTypeName }} interface {
 }
 
 {{ range .options }}
-{{ if .IsPointer }}
 func {{ $.optionPrefix }}{{ .PublicName | ToTitle }}(o {{ .Type }}) {{ $applyOptionFuncType }} {
 	return func(c *{{ $.configTypeName }}) error {
     c.{{ .Name }} = ({{ .Type }})(o)
     return nil
 	}
 }
-{{ else }}
-type {{ $.optionPrefix }}{{ .PublicName | ToTitle }} {{ .Type }}
-
-func (o {{ $.optionPrefix }}{{ .PublicName | ToTitle }}) apply(c *{{ $.configTypeName }}) error {
-  c.{{ .Name }} = ({{ .Type }})(o)
-  return nil
-}
-{{ end }}
 {{ end }}
 `
