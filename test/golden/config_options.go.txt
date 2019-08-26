@@ -8,11 +8,6 @@ import (
 	time2 "time"
 )
 
-const defaultConfigMyIntWithDefault = 1
-const defaultConfigMyRenamedIntWithDefault = 1
-const defaultConfigMyFloatWithDefault = 1.23
-const defaultConfigMyStringWithDefault = `default string`
-
 type applyOptionFunc func(c *config) error
 
 func (f applyOptionFunc) apply(c *config) error {
@@ -26,15 +21,11 @@ func newConfig(options ...Option) (config, error) {
 }
 
 func applyConfigOptions(c *config, options ...Option) error {
-
-	c.myIntWithDefault = defaultConfigMyIntWithDefault
-
-	c.myRenamedIntWithDefault = defaultConfigMyRenamedIntWithDefault
-
-	c.myFloatWithDefault = defaultConfigMyFloatWithDefault
-
-	c.myStringWithDefault = defaultConfigMyStringWithDefault
-
+	c.myIntWithDefault = 1
+	c.myRenamedIntWithDefault = 1
+	c.myFloatWithDefault = 1.23
+	c.myStringWithDefault = `default string`
+	c.myStructWithDefault.a = 1
 	for _, o := range options {
 		if err := o.apply(c); err != nil {
 			return err
@@ -166,23 +157,16 @@ func OptionMyStructWithDefault(a int) applyOptionFunc {
 	}
 }
 
-func OptionMyOptionalStruct(a int, b int) applyOptionFunc {
+func OptionMyPointerToStruct(a int, b int) applyOptionFunc {
 	return func(c *config) error {
-		c.myOptionalStruct = new(struct{ a, b int })
-		c.myOptionalStruct.a = a
-		c.myOptionalStruct.b = b
+		c.myPointerToStruct = new(struct{ a, b int })
+		c.myPointerToStruct.a = a
+		c.myPointerToStruct.b = b
 		return nil
 	}
 }
 
-func OptionMyStructWithSlice(a []int) applyOptionFunc {
-	return func(c *config) error {
-		c.myStructWithSlice.a = a
-		return nil
-	}
-}
-
-func OptionMyStructWithVariadicSlice(a int, b ...string) applyOptionFunc {
+func OptionMyStructWithVariadicSlice(a int, b ...int) applyOptionFunc {
 	return func(c *config) error {
 		c.myStructWithVariadicSlice.a = a
 		c.myStructWithVariadicSlice.b = b
@@ -197,9 +181,9 @@ func OptionMySlice(o ...int) applyOptionFunc {
 	}
 }
 
-func OptionMyOptionalSlice(o ...int) applyOptionFunc {
+func OptionMyPointerToSlice(o ...int) applyOptionFunc {
 	return func(c *config) error {
-		c.myOptionalSlice = &o
+		c.myPointerToSlice = &o
 		return nil
 	}
 }
