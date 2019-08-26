@@ -8,9 +8,9 @@ import (
 	time2 "time"
 )
 
-type applyOptionFunc func(c *config) error
+type ApplyOptionFunc func(c *config) error
 
-func (f applyOptionFunc) apply(c *config) error {
+func (f ApplyOptionFunc) apply(c *config) error {
 	return f(c)
 }
 
@@ -37,21 +37,21 @@ type Option interface {
 	apply(*config) error
 }
 
-func OptionMyInt(o int) applyOptionFunc {
+func OptionMyInt(o int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myInt = o
 		return nil
 	}
 }
 
-func OptionMyIntWithDefault(o int) applyOptionFunc {
+func OptionMyIntWithDefault(o int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myIntWithDefault = o
 		return nil
 	}
 }
 
-func OptionYourInt(o int) applyOptionFunc {
+func OptionYourInt(o int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myRenamedInt = o
 		return nil
@@ -59,7 +59,7 @@ func OptionYourInt(o int) applyOptionFunc {
 }
 
 // OptionMyDocumentedInt does something
-func OptionMyDocumentedInt(o int) applyOptionFunc {
+func OptionMyDocumentedInt(o int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myDocumentedInt = o
 		return nil
@@ -67,7 +67,7 @@ func OptionMyDocumentedInt(o int) applyOptionFunc {
 }
 
 // OptionMyCommentedInt for some reason
-func OptionMyCommentedInt(o int) applyOptionFunc {
+func OptionMyCommentedInt(o int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myCommentedInt = o
 		return nil
@@ -76,7 +76,7 @@ func OptionMyCommentedInt(o int) applyOptionFunc {
 
 // OptionMyDocAndCommentInt does something else
 // for some other reason
-func OptionMyDocAndCommentInt(o int) applyOptionFunc {
+func OptionMyDocAndCommentInt(o int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myDocAndCommentInt = o
 		return nil
@@ -85,49 +85,49 @@ func OptionMyDocAndCommentInt(o int) applyOptionFunc {
 
 // OptionMyFloat takes a float
 // really a float
-func OptionMyFloat(o float64) applyOptionFunc {
+func OptionMyFloat(o float64) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myFloat = o
 		return nil
 	}
 }
 
-func OptionMyFloatWithDefault(o float64) applyOptionFunc {
+func OptionMyFloatWithDefault(o float64) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myFloatWithDefault = o
 		return nil
 	}
 }
 
-func OptionMyString(o string) applyOptionFunc {
+func OptionMyString(o string) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myString = o
 		return nil
 	}
 }
 
-func OptionMyStringWithDefault(o string) applyOptionFunc {
+func OptionMyStringWithDefault(o string) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myStringWithDefault = o
 		return nil
 	}
 }
 
-func OptionMyFunc(o func() int) applyOptionFunc {
+func OptionMyFunc(o func() int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myFunc = o
 		return nil
 	}
 }
 
-func OptionMyIntPointer(o *int) applyOptionFunc {
+func OptionMyIntPointer(o *int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myIntPointer = o
 		return nil
 	}
 }
 
-func OptionMyInterface(o interface{}) applyOptionFunc {
+func OptionMyInterface(o interface{}) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myInterface = o
 		return nil
@@ -135,28 +135,28 @@ func OptionMyInterface(o interface{}) applyOptionFunc {
 }
 
 // OptionMyURL types requiring imports
-func OptionMyURL(o url.URL) applyOptionFunc {
+func OptionMyURL(o url.URL) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myURL = o
 		return nil
 	}
 }
 
-func OptionMyDuration(o time.Duration) applyOptionFunc {
+func OptionMyDuration(o time.Duration) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myDuration = o
 		return nil
 	}
 }
 
-func OptionMyDuration2(o time2.Duration) applyOptionFunc {
+func OptionMyDuration2(o time2.Duration) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myDuration2 = o
 		return nil
 	}
 }
 
-func OptionMyStruct(a int, b int) applyOptionFunc {
+func OptionMyStruct(a int, b int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myStruct.a = a
 		c.myStruct.b = b
@@ -164,14 +164,14 @@ func OptionMyStruct(a int, b int) applyOptionFunc {
 	}
 }
 
-func OptionMyStructWithDefault(a int) applyOptionFunc {
+func OptionMyStructWithDefault(a int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myStructWithDefault.a = a
 		return nil
 	}
 }
 
-func OptionMyPointerToStruct(a int, b int) applyOptionFunc {
+func OptionMyPointerToStruct(a int, b int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myPointerToStruct = new(struct{ a, b int })
 		c.myPointerToStruct.a = a
@@ -180,7 +180,7 @@ func OptionMyPointerToStruct(a int, b int) applyOptionFunc {
 	}
 }
 
-func OptionMyStructWithVariadicSlice(a int, b ...int) applyOptionFunc {
+func OptionMyStructWithVariadicSlice(a int, b ...int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myStructWithVariadicSlice.a = a
 		c.myStructWithVariadicSlice.b = b
@@ -188,35 +188,35 @@ func OptionMyStructWithVariadicSlice(a int, b ...int) applyOptionFunc {
 	}
 }
 
-func OptionMySlice(o ...int) applyOptionFunc {
+func OptionMySlice(o ...int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.mySlice = o
 		return nil
 	}
 }
 
-func OptionMyPointerToSlice(o ...int) applyOptionFunc {
+func OptionMyPointerToSlice(o ...int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myPointerToSlice = &o
 		return nil
 	}
 }
 
-func OptionYourSlice(o ...int) applyOptionFunc {
+func OptionYourSlice(o ...int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myRenamedSlice = o
 		return nil
 	}
 }
 
-func OptionMyPointerToInt(o int) applyOptionFunc {
+func OptionMyPointerToInt(o int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myPointerToInt = &o
 		return nil
 	}
 }
 
-func OptionYourIntWithPointer(o int) applyOptionFunc {
+func OptionYourIntWithPointer(o int) ApplyOptionFunc {
 	return func(c *config) error {
 		c.myPointerToRenamedInt = &o
 		return nil
