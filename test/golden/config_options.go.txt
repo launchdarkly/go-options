@@ -22,7 +22,6 @@ func newConfig(options ...Option) (config, error) {
 
 func applyConfigOptions(c *config, options ...Option) error {
 	c.myIntWithDefault = 1
-	c.myRenamedIntWithDefault = 1
 	c.myFloatWithDefault = 1.23
 	c.myStringWithDefault = `default string`
 	c.myStructWithDefault.a = 1
@@ -38,7 +37,6 @@ type Option interface {
 	apply(*config) error
 }
 
-// OptionMyInt takes an integer
 func OptionMyInt(o int) applyOptionFunc {
 	return func(c *config) error {
 		c.myInt = o
@@ -46,7 +44,6 @@ func OptionMyInt(o int) applyOptionFunc {
 	}
 }
 
-// OptionMyIntWithDefault has documentation
 func OptionMyIntWithDefault(o int) applyOptionFunc {
 	return func(c *config) error {
 		c.myIntWithDefault = o
@@ -54,7 +51,6 @@ func OptionMyIntWithDefault(o int) applyOptionFunc {
 	}
 }
 
-// OptionYourInt does something
 func OptionYourInt(o int) applyOptionFunc {
 	return func(c *config) error {
 		c.myRenamedInt = o
@@ -62,9 +58,27 @@ func OptionYourInt(o int) applyOptionFunc {
 	}
 }
 
-func OptionYourIntWithDefault(o int) applyOptionFunc {
+// OptionMyDocumentedInt does something
+func OptionMyDocumentedInt(o int) applyOptionFunc {
 	return func(c *config) error {
-		c.myRenamedIntWithDefault = o
+		c.myDocumentedInt = o
+		return nil
+	}
+}
+
+// OptionMyCommentedInt for some reason
+func OptionMyCommentedInt(o int) applyOptionFunc {
+	return func(c *config) error {
+		c.myCommentedInt = o
+		return nil
+	}
+}
+
+// OptionMyDocAndCommentInt does something else
+// for some other reason
+func OptionMyDocAndCommentInt(o int) applyOptionFunc {
+	return func(c *config) error {
+		c.myDocAndCommentInt = o
 		return nil
 	}
 }

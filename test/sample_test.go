@@ -66,9 +66,15 @@ var _ = Describe("Generating options", func() {
 		Ω(cfg.myFloatWithDefault).Should(Equal(1.23))
 	})
 
-	It("defines constants for default values", func() {
+	It("returns errors", func() {
 		err := applyConfigOptions(&cfg, OptionMakeError{})
 		Ω(err).Should(MatchError("bad news"))
+	})
+
+	It("allows option constructor to be renamed", func() {
+		err := applyConfigOptions(&cfg, OptionYourInt(1))
+		Ω(err).ShouldNot(HaveOccurred())
+		Ω(cfg.myRenamedInt).To(Equal(1))
 	})
 
 	Describe("custom options", func() {
