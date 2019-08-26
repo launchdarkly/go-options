@@ -8,11 +8,16 @@ import (
 
 //go:generate go-options -imports=time,net/url,time2=time config
 type config struct {
-	myInt int // takes an integer
-	// has documentation
-	myIntWithDefault        int `options:",1"`
-	myRenamedInt            int `options:"yourInt"` // does something
-	myRenamedIntWithDefault int `options:"yourIntWithDefault,1"`
+	myInt            int
+	myIntWithDefault int `options:",1"`
+	myRenamedInt     int `options:"yourInt"`
+
+	// does something
+	myDocumentedInt int
+	myCommentedInt  int // for some reason
+
+	// does something else
+	myDocAndCommentInt int // for some other reason
 
 	// takes a float
 	myFloat            float64 // really a float
@@ -32,6 +37,20 @@ type config struct {
 	myURL       url.URL
 	myDuration  time.Duration
 	myDuration2 time2.Duration
+
+	myStruct            struct{ a, b int }
+	myStructWithDefault struct {
+		a int `options:",1"`
+	}
+	myPointerToStruct         *struct{ a, b int }
+	myStructWithVariadicSlice struct {
+		a int
+		b []int `options:"..."`
+	}
+
+	mySlice          []int  `options:"..."`
+	myPointerToSlice *[]int `options:"..."`
+	myRenamedSlice   []int  `options:"yourSlice..."`
 }
 
 //go:generate go-options -type=configWithDifferentApply -func applyDifferent -option DifferentOption -new=false

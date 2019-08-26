@@ -51,12 +51,22 @@ func initFlags() {
 	flag.Usage = Usage
 }
 
+type Field struct {
+	Name         string
+	ParamName    string
+	Type         string
+	DefaultValue string
+}
+
 type Option struct {
 	Name         string
 	PublicName   string
 	DefaultValue string
-	Type         string
+	Fields       []Field
 	Docs         []string
+	DefaultIsNil bool
+	IsStruct     bool
+	Type         string
 }
 
 type Import struct {
@@ -139,27 +149,9 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 
 		var options []Option
 		for _, field := range t.Fields.List {
-			var defaultValue string
-			var publicName string
-			if field.Tag != nil {
-				value := field.Tag.Value
-				tags, err := structtag.Parse(value[1 : len(value)-1])
-				if err == nil {
-					tag, err := tags.Get("options")
-					if err != nil {
-						log.Fatalf(`ERROR: unable to parse struct tag "%s": %s`, field.Tag.Value, err)
-					}
-					if tag.Name == "-" {
-						continue
-					}
-					publicName = tag.Name
-					if len(tag.Options) > 0 {
-						defaultValue = tag.Options[0]
-					}
-					if len(tag.Options) > 1 {
-						log.Fatalf(`ERROR: format is options:"<name>,<default value>"`)
-					}
-				}
+			publicName, defaultValue, skip := parseStructTag(field)
+			if skip {
+				continue
 			}
 			var docs []string
 			if field.Doc != nil {
@@ -168,25 +160,69 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 			if field.Comment != nil {
 				docs = append(docs, field.Comment.Text())
 			}
-			typeBuf := new(bytes.Buffer)
-			if err := printer.Fprint(typeBuf, fset, field.Type); err != nil {
-				log.Fatalf("ERROR: unable to print type: %s", err)
-			}
-			typeStr := typeBuf.String()
-			if typeStr == "string" && defaultValue != "" {
-				defaultValue = fmt.Sprintf("`%s`", defaultValue)
-			}
-			for _, n := range field.Names {
-				if publicName == "" {
-					publicName = n.Name
-				}
 
+			typeStr := getType(fset, field.Type)
+
+			fieldType := field.Type
+			defaultIsNil := false
+			if t, isStar := fieldType.(*ast.StarExpr); isStar {
+				switch t.X.(type) {
+				case *ast.StructType, *ast.ArrayType:
+					fieldType = t.X
+					defaultIsNil = true
+					typeStr = getType(fset, t.X)
+				}
+			}
+
+			isStruct := false
+			var fields []Field
+			switch t := fieldType.(type) {
+			case *ast.StructType:
+				isStruct = true
+				for _, sfield := range t.Fields.List {
+					paramName, defaultValue, skip := parseStructTag(sfield)
+					if skip {
+						continue
+					}
+					typeStr := getType(fset, sfield.Type)
+					if strings.HasSuffix(paramName, "...") {
+						paramName = paramName[0 : len(paramName)-3]
+						switch t := sfield.Type.(type) {
+						case *ast.ArrayType:
+							typeStr = "..." + getType(fset, t.Elt)
+						default:
+							log.Fatalf(`expected slice type for "%+v"`, sfield)
+						}
+					}
+					for _, n := range sfield.Names {
+						fields = append(fields, Field{
+							Name:         n.Name,
+							ParamName:    stringsOr(paramName, n.Name),
+							Type:         typeStr,
+							DefaultValue: defaultValue,
+						})
+					}
+				}
+			case *ast.ArrayType:
+				if strings.HasSuffix(publicName, "...") {
+					publicName = publicName[0 : len(publicName)-3]
+					typeStr = "..." + getType(fset, t.Elt)
+				}
+				fields = append(fields, Field{Name: "", ParamName: "o", Type: typeStr})
+			default:
+				fields = append(fields, Field{Name: "", ParamName: "o", Type: typeStr})
+			}
+
+			for _, n := range field.Names {
 				options = append(options, Option{
 					Name:         n.Name,
-					PublicName:   publicName,
+					PublicName:   stringsOr(publicName, n.Name),
 					DefaultValue: defaultValue,
-					Type:         typeStr,
+					Fields:       fields,
 					Docs:         docs,
+					DefaultIsNil: defaultIsNil,
+					IsStruct:     isStruct,
+					Type:         typeStr,
 				})
 			}
 		}
@@ -242,4 +278,58 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 	}
 
 	return true
+}
+
+func parseStructTag(field *ast.Field) (publicName string, defaultValue string, skip bool) {
+	if field.Tag != nil {
+		value := field.Tag.Value
+		tags, err := structtag.Parse(value[1 : len(value)-1])
+		if err == nil {
+			tag, err := tags.Get("options")
+			if err != nil {
+				log.Fatalf(`ERROR: unable to parse struct tag "%s": %s`, field.Tag.Value, err)
+			}
+			if tag.Name == "-" {
+				return "", "", true
+			}
+			publicName = tag.Name
+			if len(tag.Options) > 0 {
+				defaultValue = tag.Options[0]
+			}
+			if len(tag.Options) > 1 {
+				log.Fatalf(`ERROR: format is options:"<name>,<default value>"`)
+			}
+		}
+	}
+	return publicName, formatDefault(field.Type, defaultValue), false
+}
+
+// getType returns a string of the type for a field by looking it up in the original source
+func getType(fset *token.FileSet, fieldType ast.Expr) string {
+	typeBuf := new(bytes.Buffer)
+	if err := printer.Fprint(typeBuf, fset, fieldType); err != nil {
+		log.Fatalf("ERROR: unable to print type: %s", err)
+	}
+	return typeBuf.String()
+}
+
+// formatDefault adds quotes to default values for string types
+func formatDefault(fieldType ast.Expr, defaultValue string) string {
+	switch t := fieldType.(type) {
+	case *ast.Ident:
+		if t.Name == "string" && defaultValue != "" {
+			return fmt.Sprintf("`%s`", defaultValue)
+		}
+	}
+	return defaultValue
+}
+
+// return first non-empty string
+func stringsOr(strs ...string) string {
+	for _, s := range strs {
+		if s != "" {
+			return s
+		}
+	}
+	return ""
 }
