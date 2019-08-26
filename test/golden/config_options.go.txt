@@ -73,6 +73,8 @@ func OptionYourIntWithDefault(o int) applyOptionFunc {
 	}
 }
 
+// OptionMyFloat takes a float
+// really a float
 func OptionMyFloat(o float64) applyOptionFunc {
 	return func(c *config) error {
 		c.myFloat = (float64)(o)
