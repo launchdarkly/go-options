@@ -132,5 +132,6 @@ The syntax for a tag is:
 - `-option <string>` sets name of the interface to use for options (default "Option")
 - `-output <string>` sets the name of the output file (default is <type>_options.go)
 - `-prefix <string>` sets prefix to be used for options (defaults to the value of `option`)
+- `-quote-default-strings=false` disables default quoting of default values for string
 - `-suffix <string>` sets suffix to be used for options (instead of prefix, cannot be used with `prefix` option)
 - `-type <string>` name of struct type to create options for (original syntax before multiple types on command-line were supported)

@@ -28,6 +28,7 @@ var runGoFmt bool
 var optionPrefix string
 var optionSuffix string
 var imports string
+var quoteStrings bool
 
 var Usage = func() {
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s <type>:\n\n", os.Args[0])
@@ -47,6 +48,7 @@ func initFlags() {
 		`name of function type created to apply options with pointer receiver to <type> (default is "apply<Option>Func")`)
 	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
 	flag.StringVar(&optionSuffix, "suffix", "", `name of suffix to use for options (forces use of suffix, cannot with used with prefix)`)
+	flag.BoolVar(&quoteStrings, "quote-default-strings", true, `set to false to disable automatic quoting of string field defaults`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
 	flag.Usage = Usage
 }
@@ -317,7 +319,7 @@ func getType(fset *token.FileSet, fieldType ast.Expr) string {
 func formatDefault(fieldType ast.Expr, defaultValue string) string {
 	switch t := fieldType.(type) {
 	case *ast.Ident:
-		if t.Name == "string" && defaultValue != "" {
+		if t.Name == "string" && defaultValue != "" && quoteStrings {
 			return fmt.Sprintf("`%s`", defaultValue)
 		}
 	}

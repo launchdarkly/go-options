@@ -196,3 +196,11 @@ var _ = Describe("Customizing the option suffix", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 })
+
+var _ = Describe("not quoting strings by default", func() {
+	It("requires them to be quoted", func() {
+		cfg, err := newConfigWithUnquotedString()
+		Ω(err).ShouldNot(HaveOccurred())
+		Ω(cfg.myString).Should(Equal("quoted"))
+	})
+})

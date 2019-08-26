@@ -53,11 +53,11 @@ type config struct {
 	myRenamedSlice   []int  `options:"yourSlice..."`
 }
 
-//go:generate go-options -type=configWithDifferentApply -func applyDifferent -option DifferentOption -new=false
+//go:generate go-options -func applyDifferent -option DifferentOption -new=false configWithDifferentApply
 type configWithDifferentApply struct {
 }
 
-//go:generate go-options -type=configWithDifferentPrefix -prefix Opt -option MyOpt
+//go:generate go-options -prefix Opt -option MyOpt configWithDifferentPrefix
 type configWithDifferentPrefix struct {
 	myFloat float64
 }
@@ -65,4 +65,9 @@ type configWithDifferentPrefix struct {
 //go:generate go-options -suffix Option -option SuffixOption configWithSuffix
 type configWithSuffix struct {
 	myFloat float64
+}
+
+//go:generate go-options -quote-default-strings=false -option UnquotedOption configWithUnquotedString
+type configWithUnquotedString struct {
+	myString string `options:",\"quoted\""`
 }
