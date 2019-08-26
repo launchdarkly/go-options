@@ -3,7 +3,7 @@ test:
 	go install .
 	go generate ./...
 	$(MAKE) lint
-	go test ./...
+	go test ./test
 	diff test/config_options.go test/golden/config_options.go
 
 lint:
