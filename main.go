@@ -54,17 +54,18 @@ type Option struct {
 	PublicName   string
 	DefaultValue string
 	Type         string
+	Docs         []string
 }
 
 type Import struct {
 	Alias string
-	Path string
+	Path  string
 }
 
 func main() {
 	initFlags()
 	flag.Parse()
-flag.CommandLine.ErrorHandling()
+	flag.CommandLine.ErrorHandling()
 	types := flag.Args()
 
 	if typeName == "" && len(types) == 0 {
@@ -154,11 +155,18 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 					}
 				}
 			}
+			var docs []string
+			if field.Doc != nil {
+				docs = append(docs, field.Doc.Text())
+			}
+			if field.Comment != nil {
+				docs = append(docs, field.Comment.Text())
+			}
 			typeBuf := new(bytes.Buffer)
 			if err := printer.Fprint(typeBuf, fset, field.Type); err != nil {
 				log.Fatalf("ERROR: unable to print type: %s", err)
 			}
-			typeStr :=  typeBuf.String()
+			typeStr := typeBuf.String()
 			if typeStr == "string" && defaultValue != "" {
 				defaultValue = fmt.Sprintf("`%s`", defaultValue)
 			}
@@ -172,6 +180,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 					PublicName:   publicName,
 					DefaultValue: defaultValue,
 					Type:         typeStr,
+					Docs:         docs,
 				})
 			}
 		}
