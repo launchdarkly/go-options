@@ -12,14 +12,6 @@ import (
 )
 {{ end }}
 
-{{ range .options }}{{ if .DefaultValue -}}
-{{ $name := .Name | ToTitle | printf "default%s%s" ($.configTypeName | ToTitle) }}
-const {{ $name }} = {{ .DefaultValue }}
-{{- if .IsStruct }}{{ range .Fields }}{{ if .DefaultValue -}}
-const {{ $name }}{{ .Name | ToTitle }} = {{ .DefaultValue }}
-{{- end }}{{ end }}{{ end -}}
-{{ end }}{{ end }}
-
 {{ $applyOptionFuncType := or $.applyOptionFuncType (printf "apply%sFunc" (ToTitle $.optionTypeName)) }}
 
 type {{ $applyOptionFuncType }} func(c *{{ $.configTypeName }}) error
@@ -40,11 +32,10 @@ return c, err
 
 func {{ $applyFuncName }}(c *{{ $.configTypeName }}, options ...{{ $.optionTypeName }}) error {
 {{- range .options -}}{{ $optionName := .Name }}{{ if .DefaultValue }}
-{{ $defaultName := .Name | ToTitle | printf "default%s%s" ($.configTypeName | ToTitle) }}
-c.{{ .Name }} = {{ $defaultName }}
-{{ if .IsStruct }}{{ range .Fields }}{{ if .DefaultValue -}}
-c.{{ $optionName }}.{{ .Name | ToTitle }} = {{ $defaultName }}{{ .Name | ToTitle }}
-{{ end }}{{ end }}{{ end }}
+    c.{{ .Name }} = {{ .DefaultValue }}
+{{- end }}{{ if .IsStruct }}{{ range .Fields }}{{ if .DefaultValue }}
+    c.{{ $optionName }}.{{ .Name }} = {{ .DefaultValue }}
+{{- end }}{{ end }}
 {{- end }}{{ end }}
 for _, o := range options {
 if err := o.apply(c); err != nil {

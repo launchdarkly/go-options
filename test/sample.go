@@ -37,16 +37,15 @@ type config struct {
 	myStructWithDefault struct {
 		a int `options:",1"`
 	}
-	myOptionalStruct          *struct{ a, b int }
-	myStructWithSlice         struct{ a []int }
+	myPointerToStruct         *struct{ a, b int }
 	myStructWithVariadicSlice struct {
 		a int
-		b []string `options:"..."`
+		b []int `options:"..."`
 	}
 
-	mySlice         []int  `options:"..."`
-	myOptionalSlice *[]int `options:"..."`
-	myRenamedSlice  []int  `options:"yourSlice..."`
+	mySlice          []int  `options:"..."`
+	myPointerToSlice *[]int `options:"..."`
+	myRenamedSlice   []int  `options:"yourSlice..."`
 }
 
 //go:generate go-options -type=configWithDifferentApply -func applyDifferent -option DifferentOption -new=false

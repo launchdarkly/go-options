@@ -105,23 +105,38 @@ var _ = Describe("Generating options", func() {
 			Ω(cfg.myURL).Should(Equal(*myURL))
 		})
 
-		It("works with nested structs", func() {
-			err := applyConfigOptions(&cfg, OptionMyStruct(1, 2))
-			Ω(err).ShouldNot(HaveOccurred())
-			Ω(cfg.myStruct.a).Should(Equal(1))
-			Ω(cfg.myStruct.b).Should(Equal(2))
-		})
+		Describe("nested structs", func() {
+			It("generates a constructor", func() {
+				err := applyConfigOptions(&cfg, OptionMyStruct(1, 2))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(cfg.myStruct.a).Should(Equal(1))
+				Ω(cfg.myStruct.b).Should(Equal(2))
+			})
 
-		It("works with nested optional structs", func() {
-			err := applyConfigOptions(&cfg)
-			Ω(err).ShouldNot(HaveOccurred())
-			Ω(cfg.myOptionalStruct).Should(BeNil())
+			It("allows default values", func() {
+				err := applyConfigOptions(&cfg)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(cfg.myStructWithDefault.a).Should(Equal(1))
+			})
 
-			err = applyConfigOptions(&cfg, OptionMyOptionalStruct(1, 2))
-			Ω(err).ShouldNot(HaveOccurred())
-			Ω(cfg.myOptionalStruct).ShouldNot(BeNil())
-			Ω(cfg.myOptionalStruct.a).Should(Equal(1))
-			Ω(cfg.myOptionalStruct.b).Should(Equal(2))
+			It("defaults pointer structs to nil", func() {
+				err := applyConfigOptions(&cfg)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(cfg.myPointerToStruct).Should(BeNil())
+
+				err = applyConfigOptions(&cfg, OptionMyPointerToStruct(1, 2))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(cfg.myPointerToStruct).ShouldNot(BeNil())
+				Ω(cfg.myPointerToStruct.a).Should(Equal(1))
+				Ω(cfg.myPointerToStruct.b).Should(Equal(2))
+			})
+
+			It("allows variadic arguments within a slice", func() {
+				err := applyConfigOptions(&cfg, OptionMyStructWithVariadicSlice(1, 1, 2))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(cfg.myStructWithDefault.a).Should(Equal(1))
+			})
+
 		})
 
 		Describe("variadic slices", func() {
@@ -134,12 +149,12 @@ var _ = Describe("Generating options", func() {
 			It("allows them to be optional", func() {
 				err := applyConfigOptions(&cfg)
 				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.myOptionalSlice).Should(BeNil())
+				Ω(cfg.myPointerToSlice).Should(BeNil())
 
-				err = applyConfigOptions(&cfg, OptionMyOptionalSlice(1, 2))
+				err = applyConfigOptions(&cfg, OptionMyPointerToSlice(1, 2))
 				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.myOptionalSlice).ShouldNot(BeNil())
-				Ω(*cfg.myOptionalSlice).Should(ConsistOf(1, 2))
+				Ω(cfg.myPointerToSlice).ShouldNot(BeNil())
+				Ω(*cfg.myPointerToSlice).Should(ConsistOf(1, 2))
 			})
 
 			It("allows them to be renamed", func() {
