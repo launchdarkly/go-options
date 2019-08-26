@@ -83,7 +83,7 @@ func OptionNumber(a int, b int) applyOptionFunc {
 You can use also use "..." at the end of a name in `options` tag to create variadic arguments, so:
 
 ```go
-struct config {
+type config struct {
   numbers []int `options:"..."`
   nums []int `options:"ints..."`
 }
@@ -97,6 +97,28 @@ func OptionNumbers(numbers ...int) applyOptionFunc {
 }
 
 func OptionInts(nums ...int) applyOptionFunc {
+    // ...
+}
+```
+
+
+You can use also use "*" at the beginning of a name in `options` tag to record whether an option was set, so:
+
+```go
+type config struct {
+  value *int `options:"*"`
+  v *int `options:"*myValue"`
+}
+```
+
+would yield:
+
+```
+func OptionValue(o ...int) applyOptionFunc {
+    // ...
+}
+
+func OptionMyValue(o ...int) applyOptionFunc {
     // ...
 }
 ```

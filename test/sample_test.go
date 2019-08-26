@@ -111,6 +111,17 @@ var _ = Describe("Generating options", func() {
 			Ω(cfg.myURL).Should(Equal(*myURL))
 		})
 
+		It("can store a pointer to let us know if a value was set", func() {
+			err := applyConfigOptions(&cfg)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myPointerToInt).Should(BeNil())
+
+			err = applyConfigOptions(&cfg, OptionMyPointerToInt(1))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myPointerToInt).ShouldNot(BeNil())
+			Ω(*cfg.myPointerToInt).Should(Equal(1))
+		})
+
 		Describe("nested structs", func() {
 			It("generates a constructor", func() {
 				err := applyConfigOptions(&cfg, OptionMyStruct(1, 2))
@@ -171,7 +182,6 @@ var _ = Describe("Generating options", func() {
 			})
 		})
 	})
-
 })
 
 var _ = Describe("Customizing the apply function name", func() {

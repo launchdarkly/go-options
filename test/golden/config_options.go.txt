@@ -208,3 +208,17 @@ func OptionYourSlice(o ...int) applyOptionFunc {
 		return nil
 	}
 }
+
+func OptionMyPointerToInt(o int) applyOptionFunc {
+	return func(c *config) error {
+		c.myPointerToInt = &o
+		return nil
+	}
+}
+
+func OptionYourIntWithPointer(o int) applyOptionFunc {
+	return func(c *config) error {
+		c.myPointerToRenamedInt = &o
+		return nil
+	}
+}

@@ -51,6 +51,9 @@ type config struct {
 	mySlice          []int  `options:"..."`
 	myPointerToSlice *[]int `options:"..."`
 	myRenamedSlice   []int  `options:"yourSlice..."`
+
+	myPointerToInt        *int `options:"*"`
+	myPointerToRenamedInt *int `options:"*yourIntWithPointer"`
 }
 
 //go:generate go-options -func applyDifferent -option DifferentOption -new=false configWithDifferentApply
