@@ -173,6 +173,12 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 					fieldType = t.X
 					defaultIsNil = true
 					typeStr = getType(fset, t.X)
+				default:
+					if strings.HasPrefix(publicName, "*") {
+						publicName = publicName[1:]
+						typeStr = getType(fset, t.X)
+						defaultIsNil = true
+					}
 				}
 			}
 
@@ -213,6 +219,10 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 				fields = append(fields, Field{Name: "", ParamName: "o", Type: typeStr})
 			default:
 				fields = append(fields, Field{Name: "", ParamName: "o", Type: typeStr})
+			}
+
+			if defaultIsNil && defaultValue != "" {
+				log.Fatalf(`cannot use pointer value with default value for fields %+v`, field.Names)
 			}
 
 			for _, n := range field.Names {
