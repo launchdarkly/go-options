@@ -46,7 +46,7 @@ func initFlags() {
 	flag.StringVar(&applyOptionFunctionType, "option_func", "",
 		`name of function type created to apply options with pointer receiver to <type> (default is "apply<Option>Func")`)
 	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
-	flag.StringVar(&optionSuffix, "suffix", "", `name of suffix to use for options (forces use of suffix)`)
+	flag.StringVar(&optionSuffix, "suffix", "", `name of suffix to use for options (forces use of suffix, cannot with used with prefix)`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
 	flag.Usage = Usage
 }
@@ -69,6 +69,10 @@ func main() {
 	flag.Parse()
 	flag.CommandLine.ErrorHandling()
 	types := flag.Args()
+
+	if optionPrefix != "" && optionSuffix != "" {
+		log.Fatal("cannot specify both -prefix and -suffix options")
+	}
 
 	if typeName == "" && len(types) == 0 {
 		flag.Usage()
