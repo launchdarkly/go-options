@@ -64,6 +64,9 @@ type {{ $.optionTypeName }} interface {
 
 {{ range .options }}
 {{ $name := .PublicName | ToTitle | printf "%s%s" $.optionPrefix }} 
+{{ if $.optionSuffix }}
+{{ $name = $.optionSuffix | printf "%s%s" (.PublicName | ToTitle) }} 
+{{ end }}
 {{ if .Docs }}
 {{- range $i, $doc := .Docs }}// {{ if eq $i 0 }}{{ $name }} {{ end }}{{ $doc }}{{ end -}}
 {{ end -}}

@@ -123,3 +123,10 @@ var _ = Describe("Customizing the option prefix", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 })
+
+var _ = Describe("Customizing the option suffix", func() {
+	It("creates options with the custom prefix", func() {
+		_, err := newConfigWithSuffix(MyFloatOption(1.23))
+		Ω(err).ShouldNot(HaveOccurred())
+	})
+})

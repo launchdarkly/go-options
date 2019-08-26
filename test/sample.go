@@ -42,3 +42,8 @@ type configWithDifferentApply struct {
 type configWithDifferentPrefix struct {
 	myFloat float64
 }
+
+//go:generate go-options -suffix Option -option SuffixOption configWithSuffix
+type configWithSuffix struct {
+	myFloat float64
+}
