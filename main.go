@@ -26,6 +26,7 @@ var applyOptionFunctionType string
 var createNewFunc bool
 var runGoFmt bool
 var optionPrefix string
+var optionSuffix string
 var imports string
 
 var Usage = func() {
@@ -45,6 +46,7 @@ func initFlags() {
 	flag.StringVar(&applyOptionFunctionType, "option_func", "",
 		`name of function type created to apply options with pointer receiver to <type> (default is "apply<Option>Func")`)
 	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
+	flag.StringVar(&optionSuffix, "suffix", "", `name of suffix to use for options (forces use of suffix)`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
 	flag.Usage = Usage
 }
@@ -217,6 +219,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 			"optionTypeName":      optionInterfaceName,
 			"configTypeName":      typeName,
 			"optionPrefix":        prefix,
+			"optionSuffix":        optionSuffix,
 			"applyFuncName":       applyFunctionName,
 			"applyOptionFuncName": applyOptionFunctionType,
 			"createNewFunc":       createNewFunc,
