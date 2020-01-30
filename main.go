@@ -39,7 +39,7 @@ var Usage = func() {
 
 func initFlags() {
 	flag.StringVar(&typeName, "type", "", "name of struct to create options for")
-	flag.BoolVar(&createNewFunc, "new", true, "with to create a function to return a new config")
+	flag.BoolVar(&createNewFunc, "new", true, "whether to create a function to return a new config")
 	flag.StringVar(&optionInterfaceName, "option", "Option", "name of the interface to use for options")
 	flag.StringVar(&imports, "imports", "", "a comma-separated list of packages with optional alias (e.g. time,url=net/url) ")
 	flag.StringVar(&outputName, "output", "", "name of output file (default is <type>_options.go)")
