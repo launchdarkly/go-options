@@ -298,7 +298,9 @@ func parseStructTag(field *ast.Field) (publicName string, defaultValue string, s
 		tags, err := structtag.Parse(value[1 : len(value)-1])
 		if err == nil {
 			tag, err := tags.Get("options")
-			if err != nil {
+			if err != nil && err.Error() == "tag does not exist" {
+				goto SkipTag
+			} else if err != nil {
 				log.Fatalf(`ERROR: unable to parse struct tag "%s": %s`, field.Tag.Value, err)
 			}
 			if tag.Name == "-" {
@@ -313,6 +315,7 @@ func parseStructTag(field *ast.Field) (publicName string, defaultValue string, s
 			}
 		}
 	}
+	SkipTag:
 	return publicName, formatDefault(field.Type, defaultValue), false
 }
 

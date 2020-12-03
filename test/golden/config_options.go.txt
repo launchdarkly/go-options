@@ -222,3 +222,18 @@ func OptionYourIntWithPointer(o int) ApplyOptionFunc {
 		return nil
 	}
 }
+
+// OptionWithJsonTagButNoOptions ensure we can handle multiple tags
+func OptionWithJsonTagButNoOptions(o string) ApplyOptionFunc {
+	return func(c *config) error {
+		c.WithJsonTagButNoOptions = o
+		return nil
+	}
+}
+
+func OptionGotBoth(o string) ApplyOptionFunc {
+	return func(c *config) error {
+		c.WithBothJsonAndOptions = o
+		return nil
+	}
+}

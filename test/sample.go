@@ -54,6 +54,10 @@ type config struct {
 
 	myPointerToInt        *int `options:"*"`
 	myPointerToRenamedInt *int `options:"*yourIntWithPointer"`
+
+	// ensure we can handle multiple tags
+	WithJsonTagButNoOptions string `json:"-"`
+	WithBothJsonAndOptions string `json:"-" options:"gotBoth"`
 }
 
 //go:generate go-options -func applyDifferent -option DifferentOption -new=false configWithDifferentApply
