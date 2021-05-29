@@ -96,13 +96,13 @@ func main() {
 	}
 
 	cfg := &packages.Config{
-		Mode:  packages.LoadSyntax,
+		Mode:  packages.NeedSyntax | packages.NeedTypes | packages.NeedName,
 		Tests: false,
 	}
 
 	pkgs, err := packages.Load(cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("ERROR: Failed to load pacakges %s", err)
 	}
 
 	if len(pkgs) != 1 {
