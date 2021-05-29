@@ -57,7 +57,7 @@ type config struct {
 
 	// ensure we can handle multiple tags
 	WithJsonTagButNoOptions string `json:"-"`
-	WithBothJsonAndOptions string `json:"-" options:"gotBoth"`
+	WithBothJsonAndOptions  string `json:"-" options:"gotBoth"`
 }
 
 //go:generate go-options -func applyDifferent -option DifferentOption -new=false configWithDifferentApply
@@ -77,4 +77,9 @@ type configWithSuffix struct {
 //go:generate go-options -quote-default-strings=false -option UnquotedOption configWithUnquotedString
 type configWithUnquotedString struct {
 	myString string `options:",\"quoted\""`
+}
+
+//go:generate go-options -cmp=false -option NoCmpOption configWithoutCmp
+type configWithoutCmp struct {
+	myInt int
 }
