@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/golangci/golangci-lint
-    rev: v1.23.1
+    rev: v1.40.1
     hooks:
       - id: golangci-lint
 
@@ -10,8 +10,3 @@ repos:
       - id: check-merge-conflict
       - id: check-yaml
       - id: no-commit-to-branch
-
-  - repo: https://github.com/danielhoherd/pre-commit-circleci
-    rev: v0.0.3
-    hooks:
-      - id: circleci-validate
