@@ -303,9 +303,23 @@ func (t Tag) Extensions() []string {
 // are of the allowed values defined for the Unicode locale extension ('u') in
 // https://www.unicode.org/reports/tr35/#Unicode_Language_and_Locale_Identifiers.
 // TypeForKey will traverse the inheritance chain to get the correct value.
+<<<<<<< HEAD
+//
+// If there are multiple types associated with a key, only the first will be
+// returned. If there is no type associated with a key, it returns the empty
+// string.
+func (t Tag) TypeForKey(key string) string {
+	if _, start, end, _ := t.findTypeForKey(key); end != start {
+		s := t.str[start:end]
+		if p := strings.IndexByte(s, '-'); p >= 0 {
+			s = s[:p]
+		}
+		return s
+=======
 func (t Tag) TypeForKey(key string) string {
 	if start, end, _ := t.findTypeForKey(key); end != start {
 		return t.str[start:end]
+>>>>>>> origin/master
 	}
 	return ""
 }
@@ -329,6 +343,15 @@ func (t Tag) SetTypeForKey(key, value string) (Tag, error) {
 
 	// Remove the setting if value is "".
 	if value == "" {
+<<<<<<< HEAD
+		start, sep, end, _ := t.findTypeForKey(key)
+		if start != sep {
+			// Remove a possible empty extension.
+			switch {
+			case t.str[start-2] != '-': // has previous elements.
+			case end == len(t.str), // end of string
+				end+2 < len(t.str) && t.str[end+2] == '-': // end of extension
+=======
 		start, end, _ := t.findTypeForKey(key)
 		if start != end {
 			// Remove key tag and leading '-'.
@@ -336,6 +359,7 @@ func (t Tag) SetTypeForKey(key, value string) (Tag, error) {
 
 			// Remove a possible empty extension.
 			if (end == len(t.str) || t.str[end+2] == '-') && t.str[start-2] == '-' {
+>>>>>>> origin/master
 				start -= 2
 			}
 			if start == int(t.pVariant) && end == len(t.str) {
@@ -381,6 +405,16 @@ func (t Tag) SetTypeForKey(key, value string) (Tag, error) {
 		t.str = string(buf[:uStart+len(b)])
 	} else {
 		s := t.str
+<<<<<<< HEAD
+		start, sep, end, hasExt := t.findTypeForKey(key)
+		if start == sep {
+			if hasExt {
+				b = b[2:]
+			}
+			t.str = fmt.Sprintf("%s-%s%s", s[:sep], b, s[end:])
+		} else {
+			t.str = fmt.Sprintf("%s-%s%s", s[:start+3], value, s[end:])
+=======
 		start, end, hasExt := t.findTypeForKey(key)
 		if start == end {
 			if hasExt {
@@ -389,6 +423,7 @@ func (t Tag) SetTypeForKey(key, value string) (Tag, error) {
 			t.str = fmt.Sprintf("%s-%s%s", s[:start], b, s[end:])
 		} else {
 			t.str = fmt.Sprintf("%s%s%s", s[:start], value, s[end:])
+>>>>>>> origin/master
 		}
 	}
 	return t, nil
@@ -399,10 +434,17 @@ func (t Tag) SetTypeForKey(key, value string) (Tag, error) {
 // wasn't found. The hasExt return value reports whether an -u extension was present.
 // Note: the extensions are typically very small and are likely to contain
 // only one key-type pair.
+<<<<<<< HEAD
+func (t Tag) findTypeForKey(key string) (start, sep, end int, hasExt bool) {
+	p := int(t.pExt)
+	if len(key) != 2 || p == len(t.str) || p == 0 {
+		return p, p, p, false
+=======
 func (t Tag) findTypeForKey(key string) (start, end int, hasExt bool) {
 	p := int(t.pExt)
 	if len(key) != 2 || p == len(t.str) || p == 0 {
 		return p, p, false
+>>>>>>> origin/master
 	}
 	s := t.str
 
@@ -410,10 +452,17 @@ func (t Tag) findTypeForKey(key string) (start, end int, hasExt bool) {
 	for p++; s[p] != 'u'; p++ {
 		if s[p] > 'u' {
 			p--
+<<<<<<< HEAD
+			return p, p, p, false
+		}
+		if p = nextExtension(s, p); p == len(s) {
+			return len(s), len(s), len(s), false
+=======
 			return p, p, false
 		}
 		if p = nextExtension(s, p); p == len(s) {
 			return len(s), len(s), false
+>>>>>>> origin/master
 		}
 	}
 	// Proceed to the hyphen following the extension name.
@@ -424,6 +473,30 @@ func (t Tag) findTypeForKey(key string) (start, end int, hasExt bool) {
 
 	// Iterate over keys until we get the end of a section.
 	for {
+<<<<<<< HEAD
+		end = p
+		for p++; p < len(s) && s[p] != '-'; p++ {
+		}
+		n := p - end - 1
+		if n <= 2 && curKey == key {
+			if sep < end {
+				sep++
+			}
+			return start, sep, end, true
+		}
+		switch n {
+		case 0, // invalid string
+			1: // next extension
+			return end, end, end, true
+		case 2:
+			// next key
+			curKey = s[end+1 : p]
+			if curKey > key {
+				return end, end, end, true
+			}
+			start = end
+			sep = p
+=======
 		// p points to the hyphen preceding the current token.
 		if p3 := p + 3; s[p3] == '-' {
 			// Found a key.
@@ -458,6 +531,7 @@ func (t Tag) findTypeForKey(key string) (start, end int, hasExt bool) {
 				return start, p, true
 			}
 			return p, p, true
+>>>>>>> origin/master
 		}
 	}
 }

@@ -29,6 +29,7 @@ var optionPrefix string
 var optionSuffix string
 var imports string
 var quoteStrings bool
+var implementEqual bool
 
 var Usage = func() {
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s <type>:\n\n", os.Args[0])
@@ -49,6 +50,7 @@ func initFlags() {
 	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
 	flag.StringVar(&optionSuffix, "suffix", "", `name of suffix to use for options (forces use of suffix, cannot with used with prefix)`)
 	flag.BoolVar(&quoteStrings, "quote-default-strings", true, `set to false to disable automatic quoting of string field defaults`)
+	flag.BoolVar(&implementEqual, "cmp", true, `set to false to disable creating Equals() method for options`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
 	flag.Usage = Usage
 }
@@ -56,6 +58,7 @@ func initFlags() {
 type Field struct {
 	Name         string
 	ParamName    string
+	ParamType    string
 	Type         string
 	DefaultValue string
 }
@@ -181,6 +184,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 					}
 				}
 			}
+			paramType := typeStr
 
 			isStruct := false
 			var fields []Field
@@ -193,11 +197,12 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 						continue
 					}
 					typeStr := getType(fset, sfield.Type)
+					paramType := typeStr
 					if strings.HasSuffix(paramName, "...") {
 						paramName = paramName[0 : len(paramName)-3]
 						switch t := sfield.Type.(type) {
 						case *ast.ArrayType:
-							typeStr = "..." + getType(fset, t.Elt)
+							paramType = "..." + getType(fset, t.Elt)
 						default:
 							log.Fatalf(`expected slice type for "%+v"`, sfield)
 						}
@@ -206,6 +211,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 						fields = append(fields, Field{
 							Name:         n.Name,
 							ParamName:    stringsOr(paramName, n.Name),
+							ParamType:    paramType,
 							Type:         typeStr,
 							DefaultValue: defaultValue,
 						})
@@ -214,11 +220,11 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 			case *ast.ArrayType:
 				if strings.HasSuffix(publicName, "...") {
 					publicName = publicName[0 : len(publicName)-3]
-					typeStr = "..." + getType(fset, t.Elt)
+					paramType = "..." + getType(fset, t.Elt)
 				}
-				fields = append(fields, Field{Name: "", ParamName: "o", Type: typeStr})
+				fields = append(fields, Field{Name: "", ParamName: "o", ParamType: paramType, Type: typeStr})
 			default:
-				fields = append(fields, Field{Name: "", ParamName: "o", Type: typeStr})
+				fields = append(fields, Field{Name: "", ParamName: "o", ParamType: paramType, Type: typeStr})
 			}
 
 			if defaultIsNil && defaultValue != "" {
@@ -275,6 +281,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 			"applyFuncName":       applyFunctionName,
 			"applyOptionFuncName": applyOptionFunctionType,
 			"createNewFunc":       createNewFunc,
+			"implementEqual":      implementEqual,
 		})
 		if err != nil {
 			log.Fatal(fmt.Errorf("template execute failed: %s", err))
@@ -315,7 +322,7 @@ func parseStructTag(field *ast.Field) (publicName string, defaultValue string, s
 			}
 		}
 	}
-	SkipTag:
+SkipTag:
 	return publicName, formatDefault(field.Type, defaultValue), false
 }
 

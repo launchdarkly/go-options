@@ -12,21 +12,25 @@ import (
 )
 {{ end }}
 
-{{ $applyOptionFuncType := or $.applyOptionFuncType (printf "Apply%sFunc" (ToTitle $.optionTypeName)) }}
+{{ if and .implementEqual .options -}}
+import "github.com/google/go-cmp/cmp"
+{{ end }}
+
+{{ $applyOptionFuncType := or $.applyOptionFuncType (printf "Apply%sFunc" (ToPublic $.optionTypeName)) }}
 
 type {{ $applyOptionFuncType }} func(c *{{ $.configTypeName }}) error
 
 func (f {{ $applyOptionFuncType }}) apply(c *{{ $.configTypeName }}) error {
-return f(c)
+    return f(c)
 }
 
-{{ $applyFuncName := or $.applyFuncName (printf "apply%sOptions" (ToTitle $.configTypeName)) }}
+{{ $applyFuncName := or $.applyFuncName (printf "apply%sOptions" (ToPublic $.configTypeName)) }}
 
 {{ if $.createNewFunc}}
-func new{{ $.configTypeName | ToTitle}}(options ...{{ $.optionTypeName }}) ({{ $.configTypeName }}, error) {
-var c {{ $.configTypeName }}
-err := {{ $applyFuncName }}(&c, options...)
-return c, err
+func new{{ $.configTypeName | ToPublic}}(options ...{{ $.optionTypeName }}) ({{ $.configTypeName }}, error) {
+    var c {{ $.configTypeName }}
+    err := {{ $applyFuncName }}(&c, options...)
+    return c, err
 }
 {{ end }}
 
@@ -37,37 +41,65 @@ func {{ $applyFuncName }}(c *{{ $.configTypeName }}, options ...{{ $.optionTypeN
     c.{{ $optionName }}.{{ .Name }} = {{ .DefaultValue }}
 {{- end }}{{ end }}
 {{- end }}{{ end }}
-for _, o := range options {
-if err := o.apply(c); err != nil {
-return err
-}
-}
-return nil
+    for _, o := range options {
+        if err := o.apply(c); err != nil {
+            return err
+            }
+    }
+    return nil
 }
 
 type {{ $.optionTypeName }} interface {
-apply(*{{ $.configTypeName }}) error
+    apply(*{{ $.configTypeName }}) error
 }
 
 {{ range .options }}{{ $option := . }}
-{{ $name := .PublicName | ToTitle | printf "%s%s" $.optionPrefix }}
-{{ if $.optionSuffix }}{{ $name = $.optionSuffix | printf "%s%s" (.PublicName | ToTitle) }}{{ end  }}
+
+{{ $name := .PublicName | ToPublic | printf "%s%s" $.optionPrefix }}
+{{ if $.optionSuffix }}{{ $name = $.optionSuffix | printf "%s%s" (.PublicName | ToPublic) }}{{ end  }}
+
+{{ $implName := $name | printf "%sImpl" | ToPrivate }}
+
+type {{ $implName }} struct {
+{{- range .Fields }}
+    {{ .ParamName }} {{ .Type }}
+{{- end }}
+}
+
+func (o {{ $implName }}) apply(c *{{ $.configTypeName }}) error {
+{{- if and $option.IsStruct $option.DefaultIsNil }}
+    c.{{ $option.Name }} = new({{ $option.Type }})
+{{- end }}
+{{- range .Fields }}{{ if $option.IsStruct }}
+    c.{{ $option.Name }}.{{ .Name }} = o.{{ .ParamName }}
+{{- else }}
+    c.{{ $option.Name }} = {{ if $option.DefaultIsNil }}&{{ end }}o.{{ .ParamName }}
+{{- end }}{{- end }}
+    return nil
+}
+
+{{ if $.implementEqual -}}
+func (o {{ $implName }}) Equal(v {{ $implName }}) bool {
+    switch {
+{{- range .Fields }}
+    case !cmp.Equal(o.{{ .ParamName }}, v.{{ .ParamName }}):
+        return false
+{{- end }}
+    }
+    return true
+}
+{{ end }}
+
 {{ if .Docs }}
 {{- range $i, $doc := .Docs }}// {{ if eq $i 0 }}{{ $name }} {{ end }}{{ $doc }}{{ end -}}
 {{ end -}}
 func {{ $name }}(
-{{- range $i, $f := .Fields }}{{ if ne $i 0 }},{{ end }}{{ $f.ParamName }} {{ $f.Type }}{{ end -}}
-) {{ $applyOptionFuncType }} {
-    return func(c *{{ $.configTypeName }}) error {
-{{- if and $option.IsStruct $option.DefaultIsNil }}
-        c.{{ $option.Name }} = new({{ $option.Type }})
+{{- range $i, $f := .Fields }}{{ if ne $i 0 }},{{ end }}{{ $f.ParamName }} {{ $f.ParamType }}{{ end -}}
+) {{ $.optionTypeName }} {
+    return {{ $implName }}{
+{{- range .Fields }}
+        {{ .ParamName }}: {{ .ParamName }},
 {{- end }}
-{{- range .Fields }}{{ if $option.IsStruct }}
-        c.{{ $option.Name }}.{{ .Name }} = {{ .ParamName }}
-{{- else }}
-        c.{{ $option.Name }} = {{ if $option.DefaultIsNil }}&{{ end }}{{ .ParamName }}
-{{- end }}{{- end }}
-        return nil
     }
 }
 {{ end }}

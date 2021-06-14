@@ -6,8 +6,11 @@ import (
 )
 
 var funcMap = template.FuncMap{
-	"ToTitle": func(s string) string {
-		return strings.ToTitle(s[:1]) + s[1:]
+	"ToPrivate": func(s string) string {
+		return strings.ToLower(s[:1]) + s[1:]
+	},
+	"ToPublic": func(s string) string {
+		return strings.ToUpper(s[:1]) + s[1:]
 	},
 }
 

@@ -3,9 +3,11 @@ package test
 import (
 	"errors"
 	"net/url"
+	"reflect"
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -64,6 +66,10 @@ var _ = Describe("Generating options", func() {
 		Ω(cfg.myIntWithDefault).Should(Equal(1))
 		Ω(cfg.myStringWithDefault).Should(Equal("default string"))
 		Ω(cfg.myFloatWithDefault).Should(Equal(1.23))
+	})
+
+	It("compares using standard equality", func() {
+		Ω(OptionMyInt(1)).Should(Equal(OptionMyInt(1)))
 	})
 
 	It("returns errors", func() {
@@ -154,6 +160,11 @@ var _ = Describe("Generating options", func() {
 				Ω(cfg.myStructWithDefault.a).Should(Equal(1))
 			})
 
+			It("allows variadic arguments to be compared with cmp", func() {
+				cmp.Equal(
+					OptionMyStructWithVariadicSlice(1, 1, 2),
+					OptionMyStructWithVariadicSlice(1, 1, 2))
+			})
 		})
 
 		Describe("variadic slices", func() {
@@ -179,6 +190,12 @@ var _ = Describe("Generating options", func() {
 				Ω(err).ShouldNot(HaveOccurred())
 				Ω(cfg.myRenamedSlice).ShouldNot(BeNil())
 				Ω(cfg.myRenamedSlice).Should(ConsistOf(1, 2))
+			})
+
+			It("allows them to the to be compared with cmp", func() {
+				Ω(cmp.Equal(
+					OptionYourSlice(1, 2),
+					OptionYourSlice(1, 2))).Should(BeTrue())
 			})
 		})
 	})
@@ -212,5 +229,12 @@ var _ = Describe("not quoting strings by default", func() {
 		cfg, err := newConfigWithUnquotedString()
 		Ω(err).ShouldNot(HaveOccurred())
 		Ω(cfg.myString).Should(Equal("quoted"))
+	})
+})
+
+var _ = Describe("Disabling cmp", func() {
+	It("prevents options from implementing Equal", func() {
+		_, equalsFound := reflect.TypeOf(NoCmpOptionMyInt(1)).MethodByName("Equal")
+		Ω(equalsFound).Should(BeFalse())
 	})
 })
