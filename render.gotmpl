@@ -76,11 +76,12 @@ func (o {{ $implName }}) apply(c *{{ $.configTypeName }}) error {
 
 {{ if $.implementEqual -}}
 func (o {{ $implName }}) Equal(v {{ $implName }}) bool {
+    switch {
 {{- range .Fields }}
-    if !cmp.Equal(o.{{ .ParamName }}, v.{{ .ParamName }}) {
+    case !cmp.Equal(o.{{ .ParamName }}, v.{{ .ParamName }}):
         return false
-    }
 {{- end }}
+    }
     return true
 }
 {{ end }}

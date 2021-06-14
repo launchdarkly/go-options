@@ -49,7 +49,8 @@ func (o optionMyIntImpl) apply(c *config) error {
 }
 
 func (o optionMyIntImpl) Equal(v optionMyIntImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -71,7 +72,8 @@ func (o optionMyIntWithDefaultImpl) apply(c *config) error {
 }
 
 func (o optionMyIntWithDefaultImpl) Equal(v optionMyIntWithDefaultImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -93,7 +95,8 @@ func (o optionYourIntImpl) apply(c *config) error {
 }
 
 func (o optionYourIntImpl) Equal(v optionYourIntImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -115,7 +118,8 @@ func (o optionMyDocumentedIntImpl) apply(c *config) error {
 }
 
 func (o optionMyDocumentedIntImpl) Equal(v optionMyDocumentedIntImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -138,7 +142,8 @@ func (o optionMyCommentedIntImpl) apply(c *config) error {
 }
 
 func (o optionMyCommentedIntImpl) Equal(v optionMyCommentedIntImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -161,7 +166,8 @@ func (o optionMyDocAndCommentIntImpl) apply(c *config) error {
 }
 
 func (o optionMyDocAndCommentIntImpl) Equal(v optionMyDocAndCommentIntImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -185,7 +191,8 @@ func (o optionMyFloatImpl) apply(c *config) error {
 }
 
 func (o optionMyFloatImpl) Equal(v optionMyFloatImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -209,7 +216,8 @@ func (o optionMyFloatWithDefaultImpl) apply(c *config) error {
 }
 
 func (o optionMyFloatWithDefaultImpl) Equal(v optionMyFloatWithDefaultImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -231,7 +239,8 @@ func (o optionMyStringImpl) apply(c *config) error {
 }
 
 func (o optionMyStringImpl) Equal(v optionMyStringImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -253,7 +262,8 @@ func (o optionMyStringWithDefaultImpl) apply(c *config) error {
 }
 
 func (o optionMyStringWithDefaultImpl) Equal(v optionMyStringWithDefaultImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -275,7 +285,8 @@ func (o optionMyFuncImpl) apply(c *config) error {
 }
 
 func (o optionMyFuncImpl) Equal(v optionMyFuncImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -297,7 +308,8 @@ func (o optionMyIntPointerImpl) apply(c *config) error {
 }
 
 func (o optionMyIntPointerImpl) Equal(v optionMyIntPointerImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -319,7 +331,8 @@ func (o optionMyInterfaceImpl) apply(c *config) error {
 }
 
 func (o optionMyInterfaceImpl) Equal(v optionMyInterfaceImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -341,7 +354,8 @@ func (o optionMyURLImpl) apply(c *config) error {
 }
 
 func (o optionMyURLImpl) Equal(v optionMyURLImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -364,7 +378,8 @@ func (o optionMyDurationImpl) apply(c *config) error {
 }
 
 func (o optionMyDurationImpl) Equal(v optionMyDurationImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -386,7 +401,8 @@ func (o optionMyDuration2Impl) apply(c *config) error {
 }
 
 func (o optionMyDuration2Impl) Equal(v optionMyDuration2Impl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -410,10 +426,10 @@ func (o optionMyStructImpl) apply(c *config) error {
 }
 
 func (o optionMyStructImpl) Equal(v optionMyStructImpl) bool {
-	if !cmp.Equal(o.a, v.a) {
+	switch {
+	case !cmp.Equal(o.a, v.a):
 		return false
-	}
-	if !cmp.Equal(o.b, v.b) {
+	case !cmp.Equal(o.b, v.b):
 		return false
 	}
 	return true
@@ -436,7 +452,8 @@ func (o optionMyStructWithDefaultImpl) apply(c *config) error {
 }
 
 func (o optionMyStructWithDefaultImpl) Equal(v optionMyStructWithDefaultImpl) bool {
-	if !cmp.Equal(o.a, v.a) {
+	switch {
+	case !cmp.Equal(o.a, v.a):
 		return false
 	}
 	return true
@@ -461,10 +478,10 @@ func (o optionMyPointerToStructImpl) apply(c *config) error {
 }
 
 func (o optionMyPointerToStructImpl) Equal(v optionMyPointerToStructImpl) bool {
-	if !cmp.Equal(o.a, v.a) {
+	switch {
+	case !cmp.Equal(o.a, v.a):
 		return false
-	}
-	if !cmp.Equal(o.b, v.b) {
+	case !cmp.Equal(o.b, v.b):
 		return false
 	}
 	return true
@@ -489,10 +506,10 @@ func (o optionMyStructWithVariadicSliceImpl) apply(c *config) error {
 }
 
 func (o optionMyStructWithVariadicSliceImpl) Equal(v optionMyStructWithVariadicSliceImpl) bool {
-	if !cmp.Equal(o.a, v.a) {
+	switch {
+	case !cmp.Equal(o.a, v.a):
 		return false
-	}
-	if !cmp.Equal(o.b, v.b) {
+	case !cmp.Equal(o.b, v.b):
 		return false
 	}
 	return true
@@ -515,7 +532,8 @@ func (o optionMySliceImpl) apply(c *config) error {
 }
 
 func (o optionMySliceImpl) Equal(v optionMySliceImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -537,7 +555,8 @@ func (o optionMyPointerToSliceImpl) apply(c *config) error {
 }
 
 func (o optionMyPointerToSliceImpl) Equal(v optionMyPointerToSliceImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -559,7 +578,8 @@ func (o optionYourSliceImpl) apply(c *config) error {
 }
 
 func (o optionYourSliceImpl) Equal(v optionYourSliceImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -581,7 +601,8 @@ func (o optionMyPointerToIntImpl) apply(c *config) error {
 }
 
 func (o optionMyPointerToIntImpl) Equal(v optionMyPointerToIntImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -603,7 +624,8 @@ func (o optionYourIntWithPointerImpl) apply(c *config) error {
 }
 
 func (o optionYourIntWithPointerImpl) Equal(v optionYourIntWithPointerImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -625,7 +647,8 @@ func (o optionWithJsonTagButNoOptionsImpl) apply(c *config) error {
 }
 
 func (o optionWithJsonTagButNoOptionsImpl) Equal(v optionWithJsonTagButNoOptionsImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
@@ -648,7 +671,8 @@ func (o optionGotBothImpl) apply(c *config) error {
 }
 
 func (o optionGotBothImpl) Equal(v optionGotBothImpl) bool {
-	if !cmp.Equal(o.o, v.o) {
+	switch {
+	case !cmp.Equal(o.o, v.o):
 		return false
 	}
 	return true
