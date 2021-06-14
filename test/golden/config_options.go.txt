@@ -8,6 +8,8 @@ import (
 	time2 "time"
 )
 
+import "github.com/google/go-cmp/cmp"
+
 type ApplyOptionFunc func(c *config) error
 
 func (f ApplyOptionFunc) apply(c *config) error {
@@ -37,203 +39,623 @@ type Option interface {
 	apply(*config) error
 }
 
-func OptionMyInt(o int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myInt = o
-		return nil
+type optionMyIntImpl struct {
+	o int
+}
+
+func (o optionMyIntImpl) apply(c *config) error {
+	c.myInt = o.o
+	return nil
+}
+
+func (o optionMyIntImpl) Equal(v optionMyIntImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyInt(o int) Option {
+	return optionMyIntImpl{
+		o: o,
 	}
 }
 
-func OptionMyIntWithDefault(o int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myIntWithDefault = o
-		return nil
+type optionMyIntWithDefaultImpl struct {
+	o int
+}
+
+func (o optionMyIntWithDefaultImpl) apply(c *config) error {
+	c.myIntWithDefault = o.o
+	return nil
+}
+
+func (o optionMyIntWithDefaultImpl) Equal(v optionMyIntWithDefaultImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyIntWithDefault(o int) Option {
+	return optionMyIntWithDefaultImpl{
+		o: o,
 	}
 }
 
-func OptionYourInt(o int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myRenamedInt = o
-		return nil
+type optionYourIntImpl struct {
+	o int
+}
+
+func (o optionYourIntImpl) apply(c *config) error {
+	c.myRenamedInt = o.o
+	return nil
+}
+
+func (o optionYourIntImpl) Equal(v optionYourIntImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
 	}
+	return true
+}
+
+func OptionYourInt(o int) Option {
+	return optionYourIntImpl{
+		o: o,
+	}
+}
+
+type optionMyDocumentedIntImpl struct {
+	o int
+}
+
+func (o optionMyDocumentedIntImpl) apply(c *config) error {
+	c.myDocumentedInt = o.o
+	return nil
+}
+
+func (o optionMyDocumentedIntImpl) Equal(v optionMyDocumentedIntImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
 }
 
 // OptionMyDocumentedInt does something
-func OptionMyDocumentedInt(o int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myDocumentedInt = o
-		return nil
+func OptionMyDocumentedInt(o int) Option {
+	return optionMyDocumentedIntImpl{
+		o: o,
 	}
 }
 
-// OptionMyCommentedInt for some reason
-func OptionMyCommentedInt(o int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myCommentedInt = o
-		return nil
+type optionMyCommentedIntImpl struct {
+	o int
+}
+
+func (o optionMyCommentedIntImpl) apply(c *config) error {
+	c.myCommentedInt = o.o
+	return nil
+}
+
+func (o optionMyCommentedIntImpl) Equal(v optionMyCommentedIntImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
 	}
+	return true
+}
+
+// OptionMyCommentedInt for some reason
+func OptionMyCommentedInt(o int) Option {
+	return optionMyCommentedIntImpl{
+		o: o,
+	}
+}
+
+type optionMyDocAndCommentIntImpl struct {
+	o int
+}
+
+func (o optionMyDocAndCommentIntImpl) apply(c *config) error {
+	c.myDocAndCommentInt = o.o
+	return nil
+}
+
+func (o optionMyDocAndCommentIntImpl) Equal(v optionMyDocAndCommentIntImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
 }
 
 // OptionMyDocAndCommentInt does something else
 // for some other reason
-func OptionMyDocAndCommentInt(o int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myDocAndCommentInt = o
-		return nil
+func OptionMyDocAndCommentInt(o int) Option {
+	return optionMyDocAndCommentIntImpl{
+		o: o,
 	}
+}
+
+type optionMyFloatImpl struct {
+	o float64
+}
+
+func (o optionMyFloatImpl) apply(c *config) error {
+	c.myFloat = o.o
+	return nil
+}
+
+func (o optionMyFloatImpl) Equal(v optionMyFloatImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
 }
 
 // OptionMyFloat takes a float
 // really a float
-func OptionMyFloat(o float64) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myFloat = o
-		return nil
+func OptionMyFloat(o float64) Option {
+	return optionMyFloatImpl{
+		o: o,
 	}
 }
 
-func OptionMyFloatWithDefault(o float64) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myFloatWithDefault = o
-		return nil
+type optionMyFloatWithDefaultImpl struct {
+	o float64
+}
+
+func (o optionMyFloatWithDefaultImpl) apply(c *config) error {
+	c.myFloatWithDefault = o.o
+	return nil
+}
+
+func (o optionMyFloatWithDefaultImpl) Equal(v optionMyFloatWithDefaultImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyFloatWithDefault(o float64) Option {
+	return optionMyFloatWithDefaultImpl{
+		o: o,
 	}
 }
 
-func OptionMyString(o string) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myString = o
-		return nil
+type optionMyStringImpl struct {
+	o string
+}
+
+func (o optionMyStringImpl) apply(c *config) error {
+	c.myString = o.o
+	return nil
+}
+
+func (o optionMyStringImpl) Equal(v optionMyStringImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyString(o string) Option {
+	return optionMyStringImpl{
+		o: o,
 	}
 }
 
-func OptionMyStringWithDefault(o string) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myStringWithDefault = o
-		return nil
+type optionMyStringWithDefaultImpl struct {
+	o string
+}
+
+func (o optionMyStringWithDefaultImpl) apply(c *config) error {
+	c.myStringWithDefault = o.o
+	return nil
+}
+
+func (o optionMyStringWithDefaultImpl) Equal(v optionMyStringWithDefaultImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyStringWithDefault(o string) Option {
+	return optionMyStringWithDefaultImpl{
+		o: o,
 	}
 }
 
-func OptionMyFunc(o func() int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myFunc = o
-		return nil
+type optionMyFuncImpl struct {
+	o func() int
+}
+
+func (o optionMyFuncImpl) apply(c *config) error {
+	c.myFunc = o.o
+	return nil
+}
+
+func (o optionMyFuncImpl) Equal(v optionMyFuncImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyFunc(o func() int) Option {
+	return optionMyFuncImpl{
+		o: o,
 	}
 }
 
-func OptionMyIntPointer(o *int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myIntPointer = o
-		return nil
+type optionMyIntPointerImpl struct {
+	o *int
+}
+
+func (o optionMyIntPointerImpl) apply(c *config) error {
+	c.myIntPointer = o.o
+	return nil
+}
+
+func (o optionMyIntPointerImpl) Equal(v optionMyIntPointerImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyIntPointer(o *int) Option {
+	return optionMyIntPointerImpl{
+		o: o,
 	}
 }
 
-func OptionMyInterface(o interface{}) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myInterface = o
-		return nil
+type optionMyInterfaceImpl struct {
+	o interface{}
+}
+
+func (o optionMyInterfaceImpl) apply(c *config) error {
+	c.myInterface = o.o
+	return nil
+}
+
+func (o optionMyInterfaceImpl) Equal(v optionMyInterfaceImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
 	}
+	return true
+}
+
+func OptionMyInterface(o interface{}) Option {
+	return optionMyInterfaceImpl{
+		o: o,
+	}
+}
+
+type optionMyURLImpl struct {
+	o url.URL
+}
+
+func (o optionMyURLImpl) apply(c *config) error {
+	c.myURL = o.o
+	return nil
+}
+
+func (o optionMyURLImpl) Equal(v optionMyURLImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
 }
 
 // OptionMyURL types requiring imports
-func OptionMyURL(o url.URL) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myURL = o
-		return nil
+func OptionMyURL(o url.URL) Option {
+	return optionMyURLImpl{
+		o: o,
 	}
 }
 
-func OptionMyDuration(o time.Duration) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myDuration = o
-		return nil
+type optionMyDurationImpl struct {
+	o time.Duration
+}
+
+func (o optionMyDurationImpl) apply(c *config) error {
+	c.myDuration = o.o
+	return nil
+}
+
+func (o optionMyDurationImpl) Equal(v optionMyDurationImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyDuration(o time.Duration) Option {
+	return optionMyDurationImpl{
+		o: o,
 	}
 }
 
-func OptionMyDuration2(o time2.Duration) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myDuration2 = o
-		return nil
+type optionMyDuration2Impl struct {
+	o time2.Duration
+}
+
+func (o optionMyDuration2Impl) apply(c *config) error {
+	c.myDuration2 = o.o
+	return nil
+}
+
+func (o optionMyDuration2Impl) Equal(v optionMyDuration2Impl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyDuration2(o time2.Duration) Option {
+	return optionMyDuration2Impl{
+		o: o,
 	}
 }
 
-func OptionMyStruct(a int, b int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myStruct.a = a
-		c.myStruct.b = b
-		return nil
+type optionMyStructImpl struct {
+	a int
+	b int
+}
+
+func (o optionMyStructImpl) apply(c *config) error {
+	c.myStruct.a = o.a
+	c.myStruct.b = o.b
+	return nil
+}
+
+func (o optionMyStructImpl) Equal(v optionMyStructImpl) bool {
+	if !cmp.Equal(o.a, v.a) {
+		return false
+	}
+	if !cmp.Equal(o.b, v.b) {
+		return false
+	}
+	return true
+}
+
+func OptionMyStruct(a int, b int) Option {
+	return optionMyStructImpl{
+		a: a,
+		b: b,
 	}
 }
 
-func OptionMyStructWithDefault(a int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myStructWithDefault.a = a
-		return nil
+type optionMyStructWithDefaultImpl struct {
+	a int
+}
+
+func (o optionMyStructWithDefaultImpl) apply(c *config) error {
+	c.myStructWithDefault.a = o.a
+	return nil
+}
+
+func (o optionMyStructWithDefaultImpl) Equal(v optionMyStructWithDefaultImpl) bool {
+	if !cmp.Equal(o.a, v.a) {
+		return false
+	}
+	return true
+}
+
+func OptionMyStructWithDefault(a int) Option {
+	return optionMyStructWithDefaultImpl{
+		a: a,
 	}
 }
 
-func OptionMyPointerToStruct(a int, b int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myPointerToStruct = new(struct{ a, b int })
-		c.myPointerToStruct.a = a
-		c.myPointerToStruct.b = b
-		return nil
+type optionMyPointerToStructImpl struct {
+	a int
+	b int
+}
+
+func (o optionMyPointerToStructImpl) apply(c *config) error {
+	c.myPointerToStruct = new(struct{ a, b int })
+	c.myPointerToStruct.a = o.a
+	c.myPointerToStruct.b = o.b
+	return nil
+}
+
+func (o optionMyPointerToStructImpl) Equal(v optionMyPointerToStructImpl) bool {
+	if !cmp.Equal(o.a, v.a) {
+		return false
+	}
+	if !cmp.Equal(o.b, v.b) {
+		return false
+	}
+	return true
+}
+
+func OptionMyPointerToStruct(a int, b int) Option {
+	return optionMyPointerToStructImpl{
+		a: a,
+		b: b,
 	}
 }
 
-func OptionMyStructWithVariadicSlice(a int, b ...int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myStructWithVariadicSlice.a = a
-		c.myStructWithVariadicSlice.b = b
-		return nil
+type optionMyStructWithVariadicSliceImpl struct {
+	a int
+	b []int
+}
+
+func (o optionMyStructWithVariadicSliceImpl) apply(c *config) error {
+	c.myStructWithVariadicSlice.a = o.a
+	c.myStructWithVariadicSlice.b = o.b
+	return nil
+}
+
+func (o optionMyStructWithVariadicSliceImpl) Equal(v optionMyStructWithVariadicSliceImpl) bool {
+	if !cmp.Equal(o.a, v.a) {
+		return false
+	}
+	if !cmp.Equal(o.b, v.b) {
+		return false
+	}
+	return true
+}
+
+func OptionMyStructWithVariadicSlice(a int, b ...int) Option {
+	return optionMyStructWithVariadicSliceImpl{
+		a: a,
+		b: b,
 	}
 }
 
-func OptionMySlice(o ...int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.mySlice = o
-		return nil
+type optionMySliceImpl struct {
+	o []int
+}
+
+func (o optionMySliceImpl) apply(c *config) error {
+	c.mySlice = o.o
+	return nil
+}
+
+func (o optionMySliceImpl) Equal(v optionMySliceImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMySlice(o ...int) Option {
+	return optionMySliceImpl{
+		o: o,
 	}
 }
 
-func OptionMyPointerToSlice(o ...int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myPointerToSlice = &o
-		return nil
+type optionMyPointerToSliceImpl struct {
+	o []int
+}
+
+func (o optionMyPointerToSliceImpl) apply(c *config) error {
+	c.myPointerToSlice = &o.o
+	return nil
+}
+
+func (o optionMyPointerToSliceImpl) Equal(v optionMyPointerToSliceImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyPointerToSlice(o ...int) Option {
+	return optionMyPointerToSliceImpl{
+		o: o,
 	}
 }
 
-func OptionYourSlice(o ...int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myRenamedSlice = o
-		return nil
+type optionYourSliceImpl struct {
+	o []int
+}
+
+func (o optionYourSliceImpl) apply(c *config) error {
+	c.myRenamedSlice = o.o
+	return nil
+}
+
+func (o optionYourSliceImpl) Equal(v optionYourSliceImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionYourSlice(o ...int) Option {
+	return optionYourSliceImpl{
+		o: o,
 	}
 }
 
-func OptionMyPointerToInt(o int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myPointerToInt = &o
-		return nil
+type optionMyPointerToIntImpl struct {
+	o int
+}
+
+func (o optionMyPointerToIntImpl) apply(c *config) error {
+	c.myPointerToInt = &o.o
+	return nil
+}
+
+func (o optionMyPointerToIntImpl) Equal(v optionMyPointerToIntImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionMyPointerToInt(o int) Option {
+	return optionMyPointerToIntImpl{
+		o: o,
 	}
 }
 
-func OptionYourIntWithPointer(o int) ApplyOptionFunc {
-	return func(c *config) error {
-		c.myPointerToRenamedInt = &o
-		return nil
+type optionYourIntWithPointerImpl struct {
+	o int
+}
+
+func (o optionYourIntWithPointerImpl) apply(c *config) error {
+	c.myPointerToRenamedInt = &o.o
+	return nil
+}
+
+func (o optionYourIntWithPointerImpl) Equal(v optionYourIntWithPointerImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
 	}
+	return true
+}
+
+func OptionYourIntWithPointer(o int) Option {
+	return optionYourIntWithPointerImpl{
+		o: o,
+	}
+}
+
+type optionWithJsonTagButNoOptionsImpl struct {
+	o string
+}
+
+func (o optionWithJsonTagButNoOptionsImpl) apply(c *config) error {
+	c.WithJsonTagButNoOptions = o.o
+	return nil
+}
+
+func (o optionWithJsonTagButNoOptionsImpl) Equal(v optionWithJsonTagButNoOptionsImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
 }
 
 // OptionWithJsonTagButNoOptions ensure we can handle multiple tags
-func OptionWithJsonTagButNoOptions(o string) ApplyOptionFunc {
-	return func(c *config) error {
-		c.WithJsonTagButNoOptions = o
-		return nil
+func OptionWithJsonTagButNoOptions(o string) Option {
+	return optionWithJsonTagButNoOptionsImpl{
+		o: o,
 	}
 }
 
-func OptionGotBoth(o string) ApplyOptionFunc {
-	return func(c *config) error {
-		c.WithBothJsonAndOptions = o
-		return nil
+type optionGotBothImpl struct {
+	o string
+}
+
+func (o optionGotBothImpl) apply(c *config) error {
+	c.WithBothJsonAndOptions = o.o
+	return nil
+}
+
+func (o optionGotBothImpl) Equal(v optionGotBothImpl) bool {
+	if !cmp.Equal(o.o, v.o) {
+		return false
+	}
+	return true
+}
+
+func OptionGotBoth(o string) Option {
+	return optionGotBothImpl{
+		o: o,
 	}
 }
