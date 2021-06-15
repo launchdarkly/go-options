@@ -30,6 +30,7 @@ var optionSuffix string
 var imports string
 var quoteStrings bool
 var implementEqual bool
+var implementString bool
 
 var Usage = func() {
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s <type>:\n\n", os.Args[0])
@@ -50,6 +51,7 @@ func initFlags() {
 	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
 	flag.StringVar(&optionSuffix, "suffix", "", `name of suffix to use for options (forces use of suffix, cannot with used with prefix)`)
 	flag.BoolVar(&quoteStrings, "quote-default-strings", true, `set to false to disable automatic quoting of string field defaults`)
+	flag.BoolVar(&implementString, "stringer", true, `set to false to disable creating String() method for options`)
 	flag.BoolVar(&implementEqual, "cmp", true, `set to false to disable creating Equals() method for options`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
 	flag.Usage = Usage
@@ -282,6 +284,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 			"applyOptionFuncName": applyOptionFunctionType,
 			"createNewFunc":       createNewFunc,
 			"implementEqual":      implementEqual,
+			"implementString":     implementString,
 		})
 		if err != nil {
 			log.Fatal(fmt.Errorf("template execute failed: %s", err))

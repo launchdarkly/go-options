@@ -2,6 +2,7 @@ package test
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 	"reflect"
 	"testing"
@@ -72,6 +73,11 @@ var _ = Describe("Generating options", func() {
 		Ω(OptionMyInt(1)).Should(Equal(OptionMyInt(1)))
 	})
 
+	It("generates a String method", func() {
+		Ω(fmt.Sprintf("%v", OptionMyInt(1))).Should(Equal("OptionMyInt: 1"))
+		Ω(fmt.Sprintf("%v", OptionMyString("abc"))).Should(Equal("OptionMyString: abc"))
+	})
+
 	It("returns errors", func() {
 		err := applyConfigOptions(&cfg, OptionMakeError{})
 		Ω(err).Should(MatchError("bad news"))
@@ -116,7 +122,9 @@ var _ = Describe("Generating options", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(cfg.myURL).Should(Equal(*myURL))
 		})
+	})
 
+	Describe("pointers", func() {
 		It("can store a pointer to let us know if a value was set", func() {
 			err := applyConfigOptions(&cfg)
 			Ω(err).ShouldNot(HaveOccurred())
@@ -128,75 +136,88 @@ var _ = Describe("Generating options", func() {
 			Ω(*cfg.myPointerToInt).Should(Equal(1))
 		})
 
-		Describe("nested structs", func() {
-			It("generates a constructor", func() {
-				err := applyConfigOptions(&cfg, OptionMyStruct(1, 2))
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.myStruct.a).Should(Equal(1))
-				Ω(cfg.myStruct.b).Should(Equal(2))
-			})
+		It("generates a String method", func() {
+			Ω(fmt.Sprintf("%v", OptionMyPointerToInt(1))).Should(Equal("OptionMyPointerToInt: 1"))
+		})
+	})
 
-			It("allows default values", func() {
-				err := applyConfigOptions(&cfg)
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.myStructWithDefault.a).Should(Equal(1))
-			})
-
-			It("defaults pointer structs to nil", func() {
-				err := applyConfigOptions(&cfg)
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.myPointerToStruct).Should(BeNil())
-
-				err = applyConfigOptions(&cfg, OptionMyPointerToStruct(1, 2))
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.myPointerToStruct).ShouldNot(BeNil())
-				Ω(cfg.myPointerToStruct.a).Should(Equal(1))
-				Ω(cfg.myPointerToStruct.b).Should(Equal(2))
-			})
-
-			It("allows variadic arguments within a slice", func() {
-				err := applyConfigOptions(&cfg, OptionMyStructWithVariadicSlice(1, 1, 2))
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.myStructWithDefault.a).Should(Equal(1))
-			})
-
-			It("allows variadic arguments to be compared with cmp", func() {
-				cmp.Equal(
-					OptionMyStructWithVariadicSlice(1, 1, 2),
-					OptionMyStructWithVariadicSlice(1, 1, 2))
-			})
+	Describe("nested structs", func() {
+		It("generates a constructor", func() {
+			err := applyConfigOptions(&cfg, OptionMyStruct(1, 2))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myStruct.a).Should(Equal(1))
+			Ω(cfg.myStruct.b).Should(Equal(2))
 		})
 
-		Describe("variadic slices", func() {
-			It("creates a variadic constructor", func() {
-				err := applyConfigOptions(&cfg, OptionMySlice(1, 2))
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.mySlice).Should(ConsistOf(1, 2))
-			})
+		It("allows default values", func() {
+			err := applyConfigOptions(&cfg)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myStructWithDefault.a).Should(Equal(1))
+		})
 
-			It("allows them to be optional", func() {
-				err := applyConfigOptions(&cfg)
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.myPointerToSlice).Should(BeNil())
+		It("defaults pointer structs to nil", func() {
+			err := applyConfigOptions(&cfg)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myPointerToStruct).Should(BeNil())
 
-				err = applyConfigOptions(&cfg, OptionMyPointerToSlice(1, 2))
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.myPointerToSlice).ShouldNot(BeNil())
-				Ω(*cfg.myPointerToSlice).Should(ConsistOf(1, 2))
-			})
+			err = applyConfigOptions(&cfg, OptionMyPointerToStruct(1, 2))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myPointerToStruct).ShouldNot(BeNil())
+			Ω(cfg.myPointerToStruct.a).Should(Equal(1))
+			Ω(cfg.myPointerToStruct.b).Should(Equal(2))
+		})
 
-			It("allows them to be renamed", func() {
-				err := applyConfigOptions(&cfg, OptionYourSlice(1, 2))
-				Ω(err).ShouldNot(HaveOccurred())
-				Ω(cfg.myRenamedSlice).ShouldNot(BeNil())
-				Ω(cfg.myRenamedSlice).Should(ConsistOf(1, 2))
-			})
+		It("allows variadic arguments within a slice", func() {
+			err := applyConfigOptions(&cfg, OptionMyStructWithVariadicSlice(1, 1, 2))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myStructWithDefault.a).Should(Equal(1))
+		})
 
-			It("allows them to the to be compared with cmp", func() {
-				Ω(cmp.Equal(
-					OptionYourSlice(1, 2),
-					OptionYourSlice(1, 2))).Should(BeTrue())
-			})
+		It("generates a String method", func() {
+			Ω(fmt.Sprintf("%v", OptionMyStructWithVariadicSlice(1, 2))).Should(
+				Equal("OptionMyStructWithVariadicSlice: {a:1 b:[2]}"))
+		})
+
+		It("allows variadic arguments to be compared with cmp", func() {
+			cmp.Equal(
+				OptionMyStructWithVariadicSlice(1, 1, 2),
+				OptionMyStructWithVariadicSlice(1, 1, 2))
+		})
+	})
+
+	Describe("variadic slices", func() {
+		It("creates a variadic constructor", func() {
+			err := applyConfigOptions(&cfg, OptionMySlice(1, 2))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.mySlice).Should(ConsistOf(1, 2))
+		})
+
+		It("allows them to be optional", func() {
+			err := applyConfigOptions(&cfg)
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myPointerToSlice).Should(BeNil())
+
+			err = applyConfigOptions(&cfg, OptionMyPointerToSlice(1, 2))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myPointerToSlice).ShouldNot(BeNil())
+			Ω(*cfg.myPointerToSlice).Should(ConsistOf(1, 2))
+		})
+
+		It("allows them to be renamed", func() {
+			err := applyConfigOptions(&cfg, OptionYourSlice(1, 2))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(cfg.myRenamedSlice).ShouldNot(BeNil())
+			Ω(cfg.myRenamedSlice).Should(ConsistOf(1, 2))
+		})
+
+		It("generates a String method", func() {
+			Ω(fmt.Sprintf("%v", OptionMySlice(1, 2))).Should(Equal("OptionMySlice: [1 2]"))
+		})
+
+		It("allows them to the to be compared with cmp", func() {
+			Ω(cmp.Equal(
+				OptionMySlice(1, 2),
+				OptionMySlice(1, 2))).Should(BeTrue())
 		})
 	})
 })
@@ -236,5 +257,11 @@ var _ = Describe("Disabling cmp", func() {
 	It("prevents options from implementing Equal", func() {
 		_, equalsFound := reflect.TypeOf(NoCmpOptionMyInt(1)).MethodByName("Equal")
 		Ω(equalsFound).Should(BeFalse())
+	})
+})
+
+var _ = Describe("Disabling stringer", func() {
+	It("prevents options from implementing String", func() {
+		Ω(fmt.Sprintf("%v", NoStringerOptionMyInt(1))).Should(Equal("{1}"))
 	})
 })
