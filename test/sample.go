@@ -83,3 +83,8 @@ type configWithUnquotedString struct {
 type configWithoutCmp struct {
 	myInt int
 }
+
+//go:generate go-options -stringer=false -option NoStringerOption configWithoutStringer
+type configWithoutStringer struct {
+	myInt int
+}

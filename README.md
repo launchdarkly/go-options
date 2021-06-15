@@ -143,6 +143,18 @@ The syntax for a tag is:
 
 `<alternateName or blank>,[optional default value]`
 
+## For testing and debugging
+
+By default, generated options can be compared using `cmp.Equal` from `github.com/google/go-cmp`.  Simple options can
+also be compared simply with `==` because they are structs; more complex options involving variadic slices and pointers 
+require using `cmp.Equal` because pointers inside the options will not match.  To allow `cmp.Equal` compare options, the
+tool generates  an `Equal` method for each option.  Generation of `Equal` methods can be disabled by setting
+`-cmp=false`.
+
+To aid with debugging and producing more meaningful error in tests, the tool generates a `String()` method for each
+option.  This method fulfills the `fmt.Stringer` interface, allowing more details about the option to be included in the
+`%v` format verb.  This behavior can be disabled by setting `-stringer=false`.
+
 ## Options
 
 `go-options` can be customized with several command-line arguments:
@@ -150,10 +162,12 @@ The syntax for a tag is:
 - `-fmt=false` disable running gofmt
 - `-func <string>` sets the name of function created to apply options to <type> (default is apply&lt;Type&gt;Options)
 - `-new=false` controls generation of the function that returns a new config (default true)
+- `-cmp=false` controls whether we generate an `Equal` method that works with `github.com/google/go-cmp` (default true)
 - `-imports=[<path>|<alias>=<path>],...` add imports to generated file
 - `-option <string>` sets name of the interface to use for options (default "Option")
 - `-output <string>` sets the name of the output file (default is <type>_options.go)
 - `-prefix <string>` sets prefix to be used for options (defaults to the value of `option`)
 - `-quote-default-strings=false` disables default quoting of default values for string
+- `-stringer=false` controls whether we generate an `String()` method that exposes option names and values.  Useful for debugging tests. (default true)
 - `-suffix <string>` sets suffix to be used for options (instead of prefix, cannot be used with `prefix` option)
 - `-type <string>` name of struct type to create options for (original syntax before multiple types on command-line were supported)
