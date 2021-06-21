@@ -1,6 +1,6 @@
 # LaunchDarkly Options Generator
 
-[![CircleCI](https://circleci.com/gh/launchdarkly/go-options.svg?style=svg)](https://circleci.com/gh/launchdarkly/go-options)
+[![CI](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)](https://github.com/launchdarkly/go-options/actions/workflows/test.yml)
 
 The LaunchDarkly Options Generator generates boilerplate code for setting options for a configuration struct using varargs syntax.  You write this:
 
