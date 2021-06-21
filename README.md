@@ -26,7 +26,7 @@ type Collection {
 
 func NewCollection(options... Option) (Foo, err) {
     cfg, err := newConfig(options...)
-    return Collection{cfg}, nil
+    return Collection{cfg}, err
 }
 ```
 
