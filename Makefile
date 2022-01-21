@@ -6,6 +6,7 @@ test:
 	$(MAKE) lint
 	go test ./...
 	diff test/config_options.go test/golden/config_options.go.txt
+	diff test/configWithNoError_options.go test/golden/configWithNoError_options.go.txt
 
 generate:
 	go generate .
