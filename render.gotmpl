@@ -18,45 +18,56 @@ import "github.com/google/go-cmp/cmp"
 
 {{ $applyOptionFuncType := or $.applyOptionFuncType (printf "Apply%sFunc" (ToPublic $.optionTypeName)) }}
 
-type {{ $applyOptionFuncType }} func(c *{{ $.configTypeName }}) error
+type {{ $applyOptionFuncType }} func(c *{{ $.configTypeName }}) {{ if $.returnError -}} error {{ end }}
 
-func (f {{ $applyOptionFuncType }}) apply(c *{{ $.configTypeName }}) error {
-    return f(c)
+func (f {{ $applyOptionFuncType }}) apply(c *{{ $.configTypeName }}) {{ if $.returnError -}} error {{ end }} {
+    {{ if $.returnError -}} return {{ end }} f(c)
 }
 
 {{ $applyFuncName := or $.applyFuncName (printf "apply%sOptions" (ToPublic $.configTypeName)) }}
 
 {{ if $.createNewFunc}}
-func new{{ $.configTypeName | ToPublic}}(options ...{{ $.optionTypeName }}) ({{ $.configTypeName }}, error) {
+func new{{ $.configTypeName | ToPublic}}(options ...{{ $.optionTypeName }}) {{ if $.returnError -}} ({{ $.configTypeName }} , error) {{else}} {{ $.configTypeName }} {{ end }} {
     var c {{ $.configTypeName }}
+    {{ if $.returnError -}}
     err := {{ $applyFuncName }}(&c, options...)
     return c, err
+    {{- else -}}
+    {{ $applyFuncName }}(&c, options...)
+    return c
+    {{- end }}
 }
 {{ end }}
 
-func {{ $applyFuncName }}(c *{{ $.configTypeName }}, options ...{{ $.optionTypeName }}) error {
+func {{ $applyFuncName }}(c *{{ $.configTypeName }}, options ...{{ $.optionTypeName }}) {{ if $.returnError -}} error {{ end }} {
 {{- range .options -}}{{ $optionName := .Name }}{{ if .DefaultValue }}
     c.{{ .Name }} = {{ .DefaultValue }}
 {{- end }}{{ if .IsStruct }}{{ range .Fields }}{{ if .DefaultValue }}
     c.{{ $optionName }}.{{ .Name }} = {{ .DefaultValue }}
 {{- end }}{{ end }}
 {{- end }}{{ end }}
+{{ if $.returnError -}}
     for _, o := range options {
         if err := o.apply(c); err != nil {
             return err
             }
     }
     return nil
+{{- else -}}
+    for _, o := range options {
+        o.apply(c)
+    }
+{{- end }}
 }
 
 type {{ $.optionTypeName }} interface {
-    apply(*{{ $.configTypeName }}) error
+    apply(*{{ $.configTypeName }}) {{ if $.returnError -}} error {{ end }}
 }
 
 {{ range .options }}{{ $option := . }}
 
 {{ $name := .PublicName | ToPublic | printf "%s%s" $.optionPrefix }}
-{{ if $.optionSuffix }}{{ $name = $.optionSuffix | printf "%s%s" (.PublicName | ToPublic) }}{{ end  }}
+{{ if $.optionSuffix }}{{ $name = $.optionSuffix | printf "%s%s" (.PublicName | ToPublic) }}{{ end }}
 
 {{ $implName := $name | printf "%sImpl" | ToPrivate }}
 
@@ -66,7 +77,7 @@ type {{ $implName }} struct {
 {{- end }}
 }
 
-func (o {{ $implName }}) apply(c *{{ $.configTypeName }}) error {
+func (o {{ $implName }}) apply(c *{{ $.configTypeName }}) {{ if $.returnError -}} error {{ end }} {
 {{- if and $option.IsStruct $option.DefaultIsNil }}
     c.{{ $option.Name }} = new({{ $option.Type }})
 {{- end }}
@@ -75,7 +86,9 @@ func (o {{ $implName }}) apply(c *{{ $.configTypeName }}) error {
 {{- else }}
     c.{{ $option.Name }} = {{ if $option.DefaultIsNil }}&{{ end }}o.{{ .ParamName }}
 {{- end }}{{- end }}
+{{ if $.returnError -}}
     return nil
+{{- end }}
 }
 
 {{ if $.implementEqual -}}

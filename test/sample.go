@@ -88,3 +88,9 @@ type configWithoutCmp struct {
 type configWithoutStringer struct {
 	myInt int
 }
+
+
+//go:generate go-options -noerror=false -option NoErrorOption configWithNoError
+type configWithNoError struct {
+	myInt int
+}
