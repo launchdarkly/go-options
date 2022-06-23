@@ -57,7 +57,7 @@ func initFlags() {
 	flag.BoolVar(&implementEqual, "cmp", true, `set to false to disable creating Equals() method for options`)
 	flag.BoolVar(&returnError, "noerror", true, `set to false if you do not want to return an error when creating a new config`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
-	flag.BoolVar(&newFuncPublic, "public", false, `set to false to make the optional new function private`)
+	flag.BoolVar(&newFuncPublic, "public", false, `set to true to make the 'new' function public`)
 	flag.Usage = Usage
 }
 
