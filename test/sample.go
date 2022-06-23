@@ -94,3 +94,8 @@ type configWithoutStringer struct {
 type configWithNoError struct {
 	myInt int
 }
+
+//go:generate go-options -public=true -option PublicFuncOption configWithPublicNewFunc
+type configWithPublicNewFunc struct {
+	myInt int
+}

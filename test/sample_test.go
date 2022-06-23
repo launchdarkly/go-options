@@ -265,3 +265,11 @@ var _ = Describe("Disabling stringer", func() {
 		Ω(fmt.Sprintf("%v", NoStringerOptionMyInt(1))).Should(Equal("{1}"))
 	})
 })
+
+var _ = Describe("Public new function", func() {
+	It("Makes the new confic cunction public", func() {
+		cfg, err := NewConfigWithPublicNewFunc(PublicFuncOptionMyInt(10))
+		Ω(err).ShouldNot(HaveOccurred())
+		Ω(cfg.myInt).Should(Equal(10))
+	})
+})
