@@ -1,0 +1,17 @@
+name: build
+
+on:
+  push:
+jobs:
+  build:
+    defaults:
+      run:
+        working-directory: "/go/src/github.com/launchdarkly/go-options"
+    runs-on: ubuntu-latest
+    container:
+      image: golang
+    steps:
+    - uses: actions/checkout@v4.1.0
+    - run: sudo apt-get install python-pip
+    - run: sudo pip install pre-commit
+    - run: make test
