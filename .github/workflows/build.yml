@@ -6,13 +6,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: golang
     steps:
     - uses: actions/checkout@v4.1.0
-    - run: |
-        whoami
-        cat /etc/os-release
+    - uses: actions/setup-go@v5
+      with:
+        go-version: '1.13'
+        check-latest: true
     - run: apt-get update && apt-get install -y python3-pip
     - run: pip install pre-commit --break-system-packages
     - run: make test
