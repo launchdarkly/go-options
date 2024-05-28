@@ -2,16 +2,17 @@ name: build
 
 on:
   push:
+
 jobs:
   build:
-    defaults:
-      run:
-        working-directory: "/go/src/github.com/launchdarkly/go-options"
     runs-on: ubuntu-latest
     container:
       image: golang
     steps:
     - uses: actions/checkout@v4.1.0
-    - run: sudo apt-get install python-pip
-    - run: sudo pip install pre-commit
+    - run: |
+        whoami
+        cat /etc/os-release
+    - run: apt-get update && apt-get install -y python3-pip
+    - run: pip install pre-commit --break-system-packages
     - run: make test

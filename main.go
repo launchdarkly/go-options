@@ -91,10 +91,6 @@ func main() {
 	flag.CommandLine.ErrorHandling()
 	types := flag.Args()
 
-	initOptions(types)
-}
-
-func initOptions(types []string) {
 	if optionPrefix != "" && optionSuffix != "" {
 		log.Fatal("cannot specify both -prefix and -suffix options")
 	}
