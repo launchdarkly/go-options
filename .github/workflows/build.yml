@@ -12,6 +12,5 @@ jobs:
       with:
         go-version: '1.13'
         check-latest: true
-    - run: apt-get update && apt-get install -y python3-pip
-    - run: pip install pre-commit --break-system-packages
+    - run: pip install pre-commit
     - run: make test
