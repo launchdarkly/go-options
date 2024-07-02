@@ -27,6 +27,7 @@ var createNewFunc bool
 var runGoFmt bool
 var optionPrefix string
 var optionSuffix string
+var buildTag string
 var imports string
 var quoteStrings bool
 var implementEqual bool
@@ -51,6 +52,7 @@ func initFlags() {
 		`name of function type created to apply options with pointer receiver to <type> (default is "apply<Option>Func")`)
 	flag.StringVar(&optionPrefix, "prefix", "", `name of prefix to use for options (default is the same as "option")`)
 	flag.StringVar(&optionSuffix, "suffix", "", `name of suffix to use for options (forces use of suffix, cannot with used with prefix)`)
+	flag.StringVar(&buildTag, "build", "", `build tags to add at the top of the file`)
 	flag.BoolVar(&quoteStrings, "quote-default-strings", true, `set to false to disable automatic quoting of string field defaults`)
 	flag.BoolVar(&implementString, "stringer", true, `set to false to disable creating String() method for options`)
 	flag.BoolVar(&implementEqual, "cmp", true, `set to false to disable creating Equals() method for options`)
@@ -268,7 +270,12 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 			outputFileName = outputName
 		}
 
-		buf := bytes.NewBuffer([]byte(fmt.Sprintf("package %s\n\n", packageName)))
+		buf := bytes.NewBuffer(nil)
+		if buildTag != "" {
+			buf.WriteString(fmt.Sprintf("//go:build %s\n\n", buildTag))
+		}
+
+		buf.WriteString(fmt.Sprintf("package %s\n\n", packageName))
 
 		prefix := optionInterfaceName
 		if optionPrefix != "" {
