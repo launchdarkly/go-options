@@ -1,9 +1,16 @@
 package main
 
 import (
+	_ "embed"
 	"strings"
 	"text/template"
 )
+
+//go:embed render_full.gotmpl
+var fullTemplateText string
+
+//go:embed render_simple.gotmpl
+var simpleTemplateText string
 
 var funcMap = template.FuncMap{
 	"ToPrivate": func(s string) string {
@@ -14,8 +21,6 @@ var funcMap = template.FuncMap{
 	},
 }
 
-// store code generating template in constant
-//go:generate bash -c "echo -e '// generated code, DO NOT EDIT\npackage main\n\nconst codeTemplateText = `' > template_text.go"
-//go:generate bash -c "cat render.gotmpl >> template_text.go"
-//go:generate bash -c "echo '`' >> template_text.go"
-var codeTemplate = template.Must(template.New("code").Funcs(funcMap).Parse(codeTemplateText))
+var fullTemplate = template.Must(template.New("code").Funcs(funcMap).Parse(fullTemplateText))
+
+var simpleTemplate = template.Must(template.New("code").Funcs(funcMap).Parse(simpleTemplateText))

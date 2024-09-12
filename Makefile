@@ -8,6 +8,7 @@ test:
 	diff test/config_options.go test/golden/config_options.go.txt
 	diff test/configWithNoError_options.go test/golden/configWithNoError_options.go.txt
 	diff test/configWithBuild_options.go test/golden/configWithBuild_options.go.txt
+	diff test/configWithoutCmpOrStringer_options.go test/golden/configWithoutCmpOrStringer_options.go.txt
 
 generate:
 	go generate .
@@ -18,6 +19,9 @@ lint:
 golden:
 	mkdir -p test/golden
 	cp test/config_options.go test/golden/config_options.go.txt
+	cp test/configWithNoError_options.go test/golden/configWithNoError_options.go.txt
+	cp test/configWithBuild_options.go test/golden/configWithBuild_options.go.txt
+	cp test/configWithoutCmpOrStringer_options.go test/golden/configWithoutCmpOrStringer_options.go.txt
 
 .PHONY: lint golden test
 
