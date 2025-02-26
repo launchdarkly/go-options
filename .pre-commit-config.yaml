@@ -1,12 +1,16 @@
 repos:
   - repo: https://github.com/golangci/golangci-lint
-    rev: v1.40.1
+    rev: v1.64.5
     hooks:
       - id: golangci-lint
+        stages: [pre-commit]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.4.0
+    rev: v5.0.0
     hooks:
       - id: check-merge-conflict
+        stages: [pre-commit]
       - id: check-yaml
+        stages: [pre-commit]
       - id: no-commit-to-branch
+        stages: [pre-commit]
