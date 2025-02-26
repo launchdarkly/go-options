@@ -94,6 +94,11 @@ type configWithNoError struct {
 	myInt int
 }
 
+//go:generate go-options -public=true -option PublicFuncOption configWithPublicNewFunc
+type configWithPublicNewFunc struct {
+	myInt int
+}
+
 //go:generate go-options -build=testing -func applyBuild -prefix BuildOpt -option BuildOption configWithBuild
 type configWithBuild struct {
 	myInt int

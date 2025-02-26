@@ -33,6 +33,7 @@ var quoteStrings bool
 var implementEqual bool
 var implementString bool
 var returnError bool
+var newFuncPublic bool
 
 var Usage = func() {
 	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s <type>:\n\n", os.Args[0])
@@ -58,6 +59,7 @@ func initFlags() {
 	flag.BoolVar(&implementEqual, "cmp", true, `set to false to disable creating Equals() method for options`)
 	flag.BoolVar(&returnError, "noerror", true, `set to false if you do not want to return an error when creating a new config`)
 	flag.BoolVar(&runGoFmt, "fmt", true, `set to false to skip go format`)
+	flag.BoolVar(&newFuncPublic, "public", false, `set to true to make the 'new' function public`)
 	flag.Usage = Usage
 }
 
@@ -295,6 +297,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 			"implementEqual":      implementEqual,
 			"implementString":     implementString,
 			"returnError":         returnError,
+			"newFuncPublic":       newFuncPublic,
 		})
 		if err != nil {
 			log.Fatal(fmt.Errorf("template execute failed: %s", err))
