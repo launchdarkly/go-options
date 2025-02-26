@@ -1,4 +1,25 @@
-run:
-  skip-dirs:
+issues:
+  exclude-dirs:
     - "^test/golden"
     - "^vendor$"
+  exclude-rules:
+    - text: "shadow: declaration of"
+      path: ".*_test.go"
+      linters:
+        - govet
+    - text: "fieldalignment: struct with"
+      path: "test/.*\\.go|.*_test\\.go"
+      linters:
+        - govet
+
+linters-settings:
+  govet:
+    enable-all: true
+
+  typecheck:
+    exclude-files:
+      - ".*_test.go$"
+
+linters:
+  disable:
+    - typecheck
