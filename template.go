@@ -1,9 +1,16 @@
 package main
 
 import (
+	_ "embed"
 	"strings"
 	"text/template"
 )
+
+//go:embed render.gotmpl
+var codeTemplateText string
+
+// store code generating template in constant
+var codeTemplate = template.Must(template.New("code").Funcs(funcMap).Parse(codeTemplateText))
 
 var funcMap = template.FuncMap{
 	"ToPrivate": func(s string) string {
@@ -13,9 +20,3 @@ var funcMap = template.FuncMap{
 		return strings.ToUpper(s[:1]) + s[1:]
 	},
 }
-
-// store code generating template in constant
-//go:generate bash -c "echo -e '// generated code, DO NOT EDIT\npackage main\n\nconst codeTemplateText = `' > template_text.go"
-//go:generate bash -c "cat render.gotmpl >> template_text.go"
-//go:generate bash -c "echo '`' >> template_text.go"
-var codeTemplate = template.Must(template.New("code").Funcs(funcMap).Parse(codeTemplateText))

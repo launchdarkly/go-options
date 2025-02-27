@@ -7,7 +7,6 @@ import (
 	"go/ast"
 	"go/printer"
 	"go/token"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -302,7 +301,7 @@ func writeOptionsFile(types []string, packageName string, node ast.Node, fset *t
 		if err != nil {
 			log.Fatal(fmt.Errorf("template execute failed: %s", err))
 		}
-		if err := ioutil.WriteFile(outputFileName, buf.Bytes(), 0644); err != nil {
+		if err := os.WriteFile(outputFileName, buf.Bytes(), 0644); err != nil {
 			log.Fatal(fmt.Errorf("write failed: %s", err))
 		}
 		cmd := exec.Command("gofmt", "-w", outputFileName)
