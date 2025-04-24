@@ -1,7 +1,6 @@
 module github.com/launchdarkly/go-options
 
-go 1.23
-toolchain go1.24.1
+go 1.23.5
 
 require (
 	github.com/fatih/structtag v1.2.0
