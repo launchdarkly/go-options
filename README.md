@@ -166,6 +166,7 @@ option.  This method fulfills the `fmt.Stringer` interface, allowing more detail
 - `-imports=[<path>|<alias>=<path>],...` add imports to generated file
 - `-option <string>` sets name of the interface to use for options (default "Option")
 - `-output <string>` sets the name of the output file (default is <type>_options.go)
+- `-input <string>` sets the name of the input file. When set uses "go/build" and "go/parser" directly, which can result in performance improvements
 - `-prefix <string>` sets prefix to be used for options (defaults to the value of `option`)
 - `-quote-default-strings=false` disables default quoting of default values for string
 - `-stringer=false` controls whether we generate an `String()` method that exposes option names and values.  Useful for debugging tests. (default true)
