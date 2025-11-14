@@ -5,11 +5,14 @@ import (
 	"flag"
 	"fmt"
 	"go/ast"
+	"go/build"
+	"go/parser"
 	"go/printer"
 	"go/token"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/fatih/structtag"
@@ -20,6 +23,7 @@ import (
 var typeName string
 var optionInterfaceName string
 var outputName string
+var inputFileName string
 var applyFunctionName string
 var applyOptionFunctionType string
 var createNewFunc bool
@@ -46,6 +50,7 @@ func initFlags() {
 	flag.BoolVar(&createNewFunc, "new", true, "whether to create a function to return a new config")
 	flag.StringVar(&optionInterfaceName, "option", "Option", "name of the interface to use for options")
 	flag.StringVar(&imports, "imports", "", "a comma-separated list of packages with optional alias (e.g. time,url=net/url) ")
+	flag.StringVar(&inputFileName, "input", "", "name of input file")
 	flag.StringVar(&outputName, "output", "", "name of output file (default is <type>_options.go)")
 	flag.StringVar(&applyFunctionName, "func", "", `name of function created to apply options to <type> (default is "apply<Type>Options")`)
 	flag.StringVar(&applyOptionFunctionType, "option_func", "",
@@ -105,6 +110,14 @@ func main() {
 		types = append(types, typeName)
 	}
 
+	if inputFileName != "" {
+		err := runWithInputFile(inputFileName, types)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+
 	cfg := &packages.Config{
 		Mode:  packages.NeedSyntax | packages.NeedTypes | packages.NeedName,
 		Tests: false,
@@ -133,6 +146,40 @@ func main() {
 	if !success {
 		log.Fatalf(`unable to find type "%s"`, typeName)
 	}
+}
+
+// runWithInputFile is an alternative to packages.Load because packages.Load requires a full go driver
+// runWithInputFile uses "go/build" and "go/parser" directly, but requires a file name to be passed.
+// This limits the number of required dependencies, and speeds up generation times
+func runWithInputFile(src string, typeNames []string) error {
+	fset := token.NewFileSet()
+
+	if ok, err := build.Default.MatchFile(filepath.Dir(src), filepath.Base(src)); err != nil {
+		return fmt.Errorf("error checking if file matches constraint %w", err)
+	} else if !ok || filepath.Ext(src) == ".s" {
+		return nil
+	}
+	f, err := parser.ParseFile(fset, src, nil, parser.ParseComments)
+	if err != nil {
+		return fmt.Errorf("error parsing %q %w", src, err)
+	}
+	if f.Name == nil || f.Name.Name == "" {
+		return fmt.Errorf("error parsing %q: no name in file", src)
+	}
+	inferedPackage := f.Name.Name
+	success := false
+	ast.Inspect(f, func(node ast.Node) bool {
+		found := writeOptionsFile(typeNames, inferedPackage, node, fset)
+		if found {
+			success = true
+		}
+		return !found
+	})
+	if !success {
+		return fmt.Errorf(`unable to find type "%s"`, typeNames)
+	}
+
+	return nil
 }
 
 func writeOptionsFile(types []string, packageName string, node ast.Node, fset *token.FileSet) (found bool) {
